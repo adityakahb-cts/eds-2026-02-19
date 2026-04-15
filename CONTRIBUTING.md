@@ -49,6 +49,13 @@ We enforce a coding styleguide using `eslint`. As part of your build, run `npm r
 
 You can fix some of the issues automatically by running `npx eslint . --fix`.
 
+All JavaScript must be documented with JSDoc:
+- Every exported function requires a JSDoc block with a description, `@param` tags for each parameter, and a `@returns` tag for non-void return values.
+- Every non-trivial internal helper function requires at minimum a JSDoc description.
+- Event-handler functions must document the event type they handle (`@param {KeyboardEvent} e`, etc.).
+
+See `docs/blocks.md` for the full JSDoc standard.
+
 ## Commit Message Format
 
 This project uses a structured commit changelog format that should be used for every commit. Use `npm run commit` instead of your usual `git commit` to generate commit messages using a wizard.

@@ -7,7 +7,9 @@
     "lint:js": "eslint .",
     "lint:css": "stylelint \"blocks/**/*.css\" \"styles/*.css\"",
     "lint": "npm run lint:js && npm run lint:css",
-    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix"
+    "lint:fix": "npm run lint:js -- --fix && npm run lint:css -- --fix",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "repository": {
     "type": "git",
@@ -19,12 +21,23 @@
     "url": "https://github.com/adobe/aem-boilerplate/issues"
   },
   "homepage": "https://github.com/adobe/aem-boilerplate#readme",
+  "dependencies": {
+    "@babel/eslint-parser": "^7.28.0",
+    "@eslint/eslintrc": "^3.0.0",
+    "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.52.0",
+    "globals": "^16.0.0"
+  },
+  "overrides": {
+    "eslint-config-airbnb-base": {
+      "eslint": "$eslint"
+    }
+  },
   "devDependencies": {
-    "@babel/eslint-parser": "7.28.6",
-    "eslint": "8.57.1",
+    "eslint": "^9.0.0",
     "eslint-config-airbnb-base": "15.0.0",
-    "eslint-plugin-import": "2.32.0",
-    "stylelint": "17.3.0",
-    "stylelint-config-standard": "40.0.0"
+    "eslint-plugin-import": "^2.32.0",
+    "stylelint": "^17.3.0",
+    "stylelint-config-standard": "^40.0.0"
   }
 }

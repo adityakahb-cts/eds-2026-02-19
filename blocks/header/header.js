@@ -4,6 +4,10 @@ import { loadFragment } from '../fragment/fragment.js';
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
 
+/**
+ * Collapses the expanded nav section or closes the mobile menu when Escape is pressed.
+ * @param {KeyboardEvent} e The keydown event
+ */
 function closeOnEscape(e) {
   if (e.code === 'Escape') {
     const nav = document.getElementById('nav');
@@ -22,6 +26,10 @@ function closeOnEscape(e) {
   }
 }
 
+/**
+ * Collapses the nav when focus moves outside the nav element.
+ * @param {FocusEvent} e The focusout event
+ */
 function closeOnFocusLost(e) {
   const nav = e.currentTarget;
   if (!nav.contains(e.relatedTarget)) {
@@ -38,6 +46,10 @@ function closeOnFocusLost(e) {
   }
 }
 
+/**
+ * Expands a nav-drop item when Enter or Space is pressed while it has focus.
+ * @param {KeyboardEvent} e The keydown event
+ */
 function openOnKeydown(e) {
   const focused = document.activeElement;
   const isNavDrop = focused.className === 'nav-drop';
@@ -49,6 +61,10 @@ function openOnKeydown(e) {
   }
 }
 
+/**
+ * Attaches the keydown handler to the currently focused nav-drop element
+ * so Enter/Space can open its dropdown.
+ */
 function focusNavSection() {
   document.activeElement.addEventListener('keydown', openOnKeydown);
 }
