@@ -43,6 +43,12 @@ export async function loadFragment(path) {
   return null;
 }
 
+/**
+ * Loads and decorates the fragment block.
+ * Reads the authored link or plain-text path, fetches the fragment page,
+ * and replaces the block's content with the fetched sections.
+ * @param {Element} block The fragment block element
+ */
 export default async function decorate(block) {
   const link = block.querySelector('a');
   const path = link ? link.getAttribute('href') : block.textContent.trim();

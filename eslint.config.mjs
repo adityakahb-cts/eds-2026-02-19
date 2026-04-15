@@ -5,17 +5,17 @@ import babelParser from '@babel/eslint-parser';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const filename = fileURLToPath(import.meta.url);
+const dirname = path.dirname(filename);
 
 const compat = new FlatCompat({
-  baseDirectory: __dirname,
+  baseDirectory: dirname,
   recommendedConfig: js.configs.recommended,
 });
 
 export default [
   {
-    ignores: ['helix-importer-ui/**', '**/*.min.js', 'eslint.config.mjs'],
+    ignores: ['helix-importer-ui/**', '**/*.min.js', '**/*.test.js', '**/*.spec.js'],
   },
   ...compat.extends('airbnb-base'),
   {

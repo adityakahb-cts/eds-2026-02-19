@@ -12,6 +12,8 @@ Reference for extending `scripts/scripts.js`, `styles/styles.css`, `styles/lazy-
 
 This is the main entry point for all page decoration. It imports utilities from `aem.js`, defines project-specific decoration logic, and orchestrates the three-phase load sequence.
 
+Every function added to `scripts.js` must be documented with a JSDoc block. Exported functions require `@param` and `@returns` tags; internal helpers require at minimum a description. Follow the same standard described in `docs/blocks.md` → *Comments and JSDoc*.
+
 ### Extension Points
 
 #### `buildAutoBlocks(main)`

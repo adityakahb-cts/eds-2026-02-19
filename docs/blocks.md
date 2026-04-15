@@ -400,6 +400,55 @@ const [headerRow, ...bodyRows] = rows;
 
 Wrap the entire decoration in a try/catch if the block has complex logic, and log errors with `console.error` so they appear in the browser console without breaking the page.
 
+## Comments and JSDoc
+
+Every JavaScript file in a block must be self-documenting. Reviewers and future contributors should be able to understand any function without reading its callers.
+
+### Rules
+
+- **Every exported function** must have a JSDoc block with a description, `@param` tags for all parameters, and a `@returns` tag if the function returns a value.
+- **Every non-trivial helper function** (anything more complex than a one-liner) must have a JSDoc block. Simple one-line utilities may use a single-line `/** description */` comment.
+- **The `decorate` function** must always include its standard JSDoc block:
+
+```js
+/**
+ * Loads and decorates the block.
+ * @param {Element} block The block element
+ */
+export default async function decorate(block) { ... }
+```
+
+- **Event-handler functions** passed to `addEventListener` must have a JSDoc block describing the event they handle and any side effects.
+- **File-level block comment** — if the block wraps a well-known external pattern or third-party integration, add a short file header comment (see `fragment.js` for an example).
+
+### JSDoc Tag Reference
+
+| Tag | When to use |
+|-----|-------------|
+| `@param {Type} name description` | Every parameter, including optional ones (`@param {string} [name]`) |
+| `@returns {Type} description` | Any non-void return value |
+| `@async` | Not required — `async function` is self-documenting |
+| `@private` | Not required — use naming conventions instead |
+
+### Examples
+
+```js
+/**
+ * Closes all expanded nav sections and collapses the hamburger menu.
+ * @param {KeyboardEvent} e The keydown event
+ */
+function closeOnEscape(e) { ... }
+
+/**
+ * Loads a fragment page and returns its decorated main element.
+ * @param {string} path Absolute pathname to the fragment (e.g. '/fragments/my-frag')
+ * @returns {Promise<HTMLElement|null>} The fragment's main element, or null if the fetch failed
+ */
+export async function loadFragment(path) { ... }
+```
+
+---
+
 ## Code Style
 
 - JavaScript: ES6+ (arrow functions, destructuring, template literals, optional chaining).

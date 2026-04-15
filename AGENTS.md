@@ -55,6 +55,9 @@ The repository provides the basic structure, blocks, and configuration needed to
 - Follow Airbnb ESLint rules (already configured)
 - Always include `.js` file extensions in imports
 - Use Unix line endings (LF)
+- Every exported function must have a JSDoc block with a description, `@param` tags for all parameters, and a `@returns` tag for any non-void return value
+- Every non-trivial helper function (anything more than a one-liner) must have a JSDoc block; event-handler functions must document the event type they handle
+- See `docs/blocks.md` → *Comments and JSDoc* for the full standard and tag reference
 
 ### CSS
 - Follow Stylelint standard configuration
@@ -95,9 +98,9 @@ Every block must have a `block.md` file that documents the content model as a da
 
 The block javascript should export a default function which is called to perform the block decoration:
 
-```
+```js
 /**
- * loads and decorates the block
+ * Loads and decorates the block.
  * @param {Element} block The block element
  */
 export default async function decorate(block) {
