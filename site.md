@@ -1,0 +1,693 @@
+# Site Plan — Bootstrap-Style Documentation Site
+
+A documentation and showcase website built on Edge Delivery Services (EDS / AEM), surfacing all design system elements: typography, grid, blocks, helper classes, utilities, and forms. Supports dark and light modes via a CSS `prefers-color-scheme` media query plus an explicit toggle.
+
+---
+
+## Site Architecture
+
+### Pages
+
+| Page | Path | Description |
+|---|---|---|
+| Home | `/` | Intro, quick-start links, design system overview |
+| Typography | `/typography` | Font families, sizes, weights, headings, body text, lists, quotes |
+| Grid | `/grid` | 12-column grid, section layouts, responsive breakpoints, offset and nesting |
+| Blocks | `/blocks` | Live demos of every block with authored markup and decoration output |
+| Helper Classes | `/helpers` | Utility classes for spacing, alignment, visibility, and text treatment |
+| Utilities | `/utilities` | CSS custom properties reference, icons, images, colour swatches |
+| Forms | `/forms` | Input types, select, textarea, checkbox, radio, validation states |
+
+---
+
+## Dark / Light Mode Strategy
+
+- **Auto mode**: Respect `prefers-color-scheme` media query by default.
+- **Manual toggle**: A theme-toggle block injects a `<button>` in the header that writes `data-theme="dark"` or `data-theme="light"` to `<html>` and persists the choice to `localStorage`.
+- **CSS implementation**: All colour tokens are defined in `:root` (light) and overridden in `[data-theme="dark"]` (plus `@media (prefers-color-scheme: dark)` for users who have not toggled manually). Tokens to add:
+
+```css
+/* Light (default) */
+--background-color: #ffffff;
+--surface-color: #f8f8f8;
+--text-color: #131313;
+--muted-color: #505050;
+--border-color: #e0e0e0;
+--link-color: #3b63fb;
+--link-hover-color: #1d3ecf;
+--accent-color: #3b63fb;
+--accent-hover-color: #1d3ecf;
+
+/* Dark overrides — added in globals phase */
+--background-color: #121212;
+--surface-color: #1e1e1e;
+--text-color: #f0f0f0;
+--muted-color: #aaaaaa;
+--border-color: #333333;
+--link-color: #7b9fff;
+--link-hover-color: #a0b8ff;
+--accent-color: #7b9fff;
+--accent-hover-color: #a0b8ff;
+```
+
+- The toggle block is added to the header fragment via auto-blocking so it is available on every page.
+
+---
+
+## Blocks to Develop
+
+### 1. `theme-toggle`
+**Purpose**: Dark / light mode toggle button rendered in the header.  
+**Authored content**: None — zero-configuration block. Authors add an empty `Theme Toggle` block to the header fragment and the block wires up the rest.  
+**Behaviour**:
+- Reads current theme from `localStorage` or `prefers-color-scheme` on load.
+- Sets `data-theme` on `<html>`.
+- Provides a `<button aria-pressed>` with sun/moon SVG icons.
+- Listens to `change` events on the OS media query to sync when user changes OS preference and no manual override exists.  
+**Files**: `theme-toggle.js`, `theme-toggle.css`, `block.md`, `markup.js`, `theme-toggle.spec.js`
+
+---
+
+### 2. `tabs`
+**Purpose**: Tabbed content panels for multi-variant documentation (e.g., HTML / CSS / JS views).  
+**Authored content**: Each row is one tab — Row 1: tab label, Row 2: tab panel content (rich text only).  
+**Behaviour**:
+- Renders a `<ul role="tablist">` with `<button role="tab">` elements.
+- Panels use `role="tabpanel"` with `hidden` attribute toggled on activation.
+- Keyboard navigation: arrow keys cycle tabs; Home/End jump to first/last.  
+**Files**: `tabs.js`, `tabs.css`, `block.md`, `markup.js`, `tabs.spec.js`
+
+---
+
+### 3. `accordion`
+**Purpose**: Collapsible content sections for FAQs, documentation details, and progressive disclosure.  
+**Authored content**: Each row is one panel — Row 1: panel heading (trigger text), Row 2: panel body (rich text).  
+**Behaviour**:
+- Renders `<details>`/`<summary>` pairs for native, JS-free fallback.
+- Enhanced with ARIA `aria-expanded` / `aria-controls` and smooth height animation via CSS `grid-template-rows` trick.
+- Supports `accordion (exclusive)` variation where only one panel is open at a time.
+- Keyboard: Enter/Space toggle; arrow keys move between triggers.  
+**Files**: `accordion.js`, `accordion.css`, `block.md`, `markup.js`, `accordion.spec.js`
+
+---
+
+### 4. `button`
+**Purpose**: Showcase and provide all button variants used across the design system.  
+**Authored content**: Each row is one button — Row 1: label, Row 2: variant (primary | secondary | outline | ghost | danger), Row 3 (optional): size (sm | md | lg), Row 4 (optional): href for link-style buttons.  
+**Behaviour**:
+- Renders `<button>` or `<a class="button">` depending on whether an href is provided.
+- Applies variant and size modifier classes: `.button--primary`, `.button--sm`, etc.
+- Shows all variants in a grid on the `/button` demo page.
+- Disabled state supported via `disabled` attribute / `.is-disabled` class.  
+**Files**: `button.js`, `button.css`, `block.md`, `markup.js`, `button.spec.js`
+
+---
+
+### 5. `card`
+**Purpose**: Content card with image, heading, body text, and optional CTA link.  
+**Authored content**: Each row is one card — Row 1: image, Row 2: heading, Row 3: body text, Row 4 (optional): CTA link.  
+**Behaviour**:
+- Renders a `<ul>` of `<li>` card items in a responsive CSS grid (1 → 2 → 3 columns).
+- Supports `card (horizontal)` variation for image-left layout.
+- Image uses `createOptimizedPicture` for responsive art direction.
+- CTA link styled as a button using existing `.button` class.  
+**Files**: `card.js`, `card.css`, `block.md`, `markup.js`, `card.spec.js`
+
+---
+
+### 6. `grid-demo`
+**Purpose**: Interactive visualiser showing the 12-column layout system and responsive breakpoints.  
+**Authored content**:
+- Row 1: column spans to demonstrate (e.g. "4 4 4" renders three 4-col spans)
+- Row 2 (optional): label per span  
+**Behaviour**:
+- Renders labelled column cells inside a 12-column CSS grid container.
+- A breakpoint bar shows the current active breakpoint (default / sm / md / lg / xl / xxl).
+- Highlighted cells display their span count.  
+**Files**: `grid-demo.js`, `grid-demo.css`, `block.md`, `markup.js`, `grid-demo.spec.js`
+
+---
+
+### 7. `form-demo`
+**Purpose**: Showcase all form element types and validation states.  
+**Authored content**: Each row is one form field — Row 1: input type (text | email | password | select | textarea | checkbox | radio), Row 2: label, Row 3 (optional): help text.  
+**Behaviour**:
+- Renders fully functional, accessible form controls.
+- Each control shown in all states (default / focus / error / disabled) in a grid.
+- Uses `fieldset` + `legend` grouping for radio/checkbox groups.
+- Validation states driven by CSS classes: `.is-valid`, `.is-invalid`.  
+**Files**: `form-demo.js`, `form-demo.css`, `block.md`, `markup.js`, `form-demo.spec.js`
+
+---
+
+### 8. `offcanvas`
+**Purpose**: Slide-in panel from any edge (left, right, top, bottom) for navigation, filters, or supplemental content.  
+**Authored content**: Row 1: trigger label, Row 2: panel position (left | right | top | bottom), Row 3: panel content (rich text only).  
+**Behaviour**:
+- Trigger button opens the panel; overlay click and Escape key close it.
+- Panel slides in with a CSS `transform` transition; overlay fades in.
+- Focus is trapped inside the open panel (`Tab` / `Shift+Tab` cycle).
+- `aria-modal="true"` and `role="dialog"` on the panel; `aria-expanded` on trigger.
+- Body scroll locked while panel is open (`overflow: hidden` on `<body>`).  
+**Files**: `offcanvas.js`, `offcanvas.css`, `block.md`, `markup.js`, `offcanvas.spec.js`
+
+---
+
+### 9. `modal`
+**Purpose**: Overlay dialog for confirmations, forms, image lightboxes, or detailed content.  
+**Authored content**: Row 1: trigger label, Row 2: modal title, Row 3: modal body content (rich text), Row 4 (optional): footer actions (links/buttons).  
+**Behaviour**:
+- Uses the native `<dialog>` element with `showModal()` / `close()` for built-in backdrop and focus management.
+- Escape key and close button dismiss the modal.
+- Supports `modal (fullscreen)` variation.
+- Focus returns to the trigger element on close.
+- `aria-labelledby` wired to the modal title.  
+**Files**: `modal.js`, `modal.css`, `block.md`, `markup.js`, `modal.spec.js`
+
+---
+
+### 10. `alerts`
+**Purpose**: Dismissible inline feedback messages for success, info, warning, and danger states.  
+**Authored content**: Row 1: variant (success | info | warning | danger), Row 2: message content (rich text), Row 3 (optional): "dismissible" flag.  
+**Behaviour**:
+- Applies `.alert--{variant}` class for colour and icon.
+- SVG icon injected from `/icons/{variant}.svg`.
+- Dismiss button removes the alert from the DOM with a fade-out transition when `dismissible` is set.
+- `role="alert"` on danger/warning; `role="status"` on success/info for appropriate live-region behaviour.  
+**Files**: `alerts.js`, `alerts.css`, `block.md`, `markup.js`, `alerts.spec.js`
+
+---
+
+### 11. `breadcrumbs`
+**Purpose**: Hierarchical page location trail for navigation context.  
+**Authored content**: Each row is one crumb — Row 1: label, Row 2: href (omit for current page).  
+**Behaviour**:
+- Renders a `<nav aria-label="Breadcrumb">` with an `<ol>` list.
+- Last item has `aria-current="page"` and no link.
+- Separator is injected via CSS `::after` (configurable via `--breadcrumb-separator` token).
+- Truncates on narrow viewports with an ellipsis crumb that expands on tap.  
+**Files**: `breadcrumbs.js`, `breadcrumbs.css`, `block.md`, `markup.js`, `breadcrumbs.spec.js`
+
+---
+
+### 12. `toc` (Table of Contents)
+**Purpose**: Auto-generated in-page navigation for long documentation pages.  
+**Authored content**: Zero-configuration block placed at the top of a documentation page.  
+**Behaviour**:
+- Scans the page for `h2` and `h3` elements after decoration.
+- Builds a nested `<nav>` with anchor links.
+- Highlights the active section on scroll using `IntersectionObserver`.
+- Sticky on desktop (positioned in the left rail).  
+**Files**: `toc.js`, `toc.css`, `block.md`, `markup.js`, `toc.spec.js`
+
+---
+
+### 13. `callout`
+**Purpose**: Highlighted info, warning, tip, and danger notices inline with content.  
+**Authored content**: Row 1: variant (info | warning | tip | danger), Row 2: message content (rich text).  
+**Behaviour**:
+- Applies `.callout--{variant}` class to drive icon and colour.
+- SVG icon injected from `/icons/{variant}.svg`.
+- `role="note"` or `role="alert"` depending on variant severity.  
+**Files**: `callout.js`, `callout.css`, `block.md`, `markup.js`, `callout.spec.js`
+
+---
+
+### 14. `type-specimen`
+**Purpose**: Full typography specimen showing every heading level, body size, weight, and style in the current theme.  
+**Authored content**: Zero-configuration block; authors drop an empty `Type Specimen` block on the typography page.  
+**Behaviour**:
+- Programmatically generates `h1`–`h6`, paragraph, lead, small, monospace, and blockquote examples.
+- Each entry shows the CSS variable name used.
+- Mirrors live values from `getComputedStyle` so the page always reflects the current token values.  
+**Files**: `type-specimen.js`, `type-specimen.css`, `block.md`, `markup.js`, `type-specimen.spec.js`
+
+---
+
+## Global Style Additions
+
+### styles/styles.css
+- Add dark-mode colour token overrides under `[data-theme="dark"]` and `@media (prefers-color-scheme: dark)`.
+- Add 12-column grid utilities as CSS custom properties (`--grid-columns: 12`, `--grid-gap: 1.5rem`).
+- Define semantic colour tokens: `--color-success`, `--color-warning`, `--color-danger`, `--color-info`.
+- Define border-radius tokens: `--border-radius-s`, `--border-radius-m`, `--border-radius-l`.
+- Define shadow tokens: `--shadow-s`, `--shadow-m`, `--shadow-l`.
+- Define transition token: `--transition-speed: 200ms`.
+
+### styles/lazy-styles.css
+- Helper / utility classes (loaded post-LCP, safe for layout):
+  - **Spacing**: `.mt-{1-5}`, `.mb-{1-5}`, `.p-{1-5}` using `--spacing-{n}` tokens.
+  - **Text alignment**: `.text-left`, `.text-center`, `.text-right`.
+  - **Display**: `.d-none`, `.d-block`, `.d-flex`, `.d-grid`.
+  - **Visibility**: `.visually-hidden` (SR-only pattern).
+  - **Flex utilities**: `.flex-row`, `.flex-col`, `.gap-{1-3}`, `.align-center`, `.justify-between`.
+  - **Grid utilities**: `.col-{1-12}` for spanning columns in a grid section.
+  - **Text treatment**: `.text-muted`, `.text-small`, `.text-lead`, `.text-mono`, `.text-truncate`.
+  - **Surface**: `.surface` (applies `--surface-color` background), `.rounded`, `.bordered`.
+
+### scripts/scripts.js
+- Wire up `theme-toggle` detection in `buildAutoBlocks`: if the header contains a `[href*="theme-toggle"]` or `theme toggle` block, initialise theme from `localStorage` / `prefers-color-scheme` before first paint to prevent flash of wrong theme (FOWT).
+
+---
+
+## Fonts & Colour Palette (Pending)
+
+Font choices and the full colour palette will be added by the user. Placeholder tokens are defined in `styles/styles.css` using the existing Roboto stack. Once fonts are confirmed:
+1. Add `@font-face` declarations to `styles/fonts.css`.
+2. Update `--body-font-family` and `--heading-font-family` tokens.
+3. Add `size-adjust` fallback metrics.
+
+Once the colour palette is confirmed:
+1. Replace placeholder hex values in `--color-*` tokens.
+2. Update dark-mode overrides accordingly.
+
+---
+
+## Development Order
+
+1. **Global styles** — Dark/light tokens, grid utilities, helper classes in `styles/styles.css` and `lazy-styles.css`.
+2. **`theme-toggle`** — Needed early so every subsequent page can be tested in both themes.
+3. **`toc`** — Needed to navigate long doc pages during development.
+4. **`breadcrumbs`** — Shared navigation chrome; needed on all doc pages.
+5. **`callout`** — Used heavily across all doc pages for notes and warnings.
+6. **`alerts`** — Close sibling to callout; share token and icon patterns.
+7. **`tabs`** — Used for variant switching on block demo pages.
+8. **`accordion`** — Docs and FAQ sections.
+9. **`button`** — Referenced by card and form-demo; needed first.
+10. **`card`** — Grid and blocks pages.
+11. **`modal`** — Standalone interactive block.
+12. **`offcanvas`** — Standalone interactive block.
+13. **`type-specimen`** — Typography page.
+14. **`grid-demo`** — Grid page.
+15. **`form-demo`** — Forms page.
+16. **Content pages** — Author all seven doc pages (home, typography, grid, blocks, helpers, utilities, forms).
+
+---
+
+## Modern Platform Features
+
+All features in this section are baseline-available across Chrome, Firefox, and Safari stable releases as of 2026. No polyfills or transpilation are used; EDS ships vanilla JS and CSS as-is.
+
+---
+
+### CSS Modern Features
+
+#### Math Functions (CSS Values Level 4)
+Use in token definitions and utility classes wherever they replace magic numbers.
+
+| Function | Purpose | Example |
+|---|---|---|
+| `rem(a, b)` | Remainder of `a ÷ b`, same sign as `a` | `rem(17px, 5px)` → `2px` |
+| `mod(a, b)` | Modulo, same sign as `b` | `mod(-1, 3)` → `2` |
+| `round(strategy, val, step)` | Snap to nearest step | `round(nearest, 1.3rem, 0.25rem)` → `1.25rem` |
+| `abs(val)` | Absolute value | `abs(-1em)` → `1em` |
+| `sign(val)` | Returns `−1`, `0`, or `1` | Used with `calc()` for direction logic |
+| `min()` / `max()` / `clamp()` | Constrain a value | `clamp(1rem, 2.5vw, 1.5rem)` for fluid type |
+
+Prefer `clamp()` for fluid typography and spacing; use `round()` to snap spacing tokens to the base-4 grid.
+
+#### Color Functions
+All color tokens must be defined in `oklch()`. `oklch` is perceptually uniform, making palette generation (lightness steps, alpha variants) predictable.
+
+```css
+--color-primary: oklch(55% 0.22 260);              /* base */
+--color-primary-light: oklch(75% 0.18 260);        /* tint */
+--color-primary-dark: oklch(35% 0.24 260);         /* shade */
+```
+
+Use `color-mix()` for derived tokens rather than hard-coded hex values:
+
+```css
+--color-primary-alpha-20: color-mix(in oklch, var(--color-primary) 20%, transparent);
+--surface-color: color-mix(in oklch, var(--background-color) 95%, var(--color-primary));
+```
+
+Use `light-dark()` as a shorthand where only two token values differ between themes:
+
+```css
+color: light-dark(var(--text-color-light), var(--text-color-dark));
+```
+
+#### Cascade Layers (`@layer`)
+Declare a layer order at the top of `styles.css` so third-party overrides never win by accident:
+
+```css
+@layer reset, tokens, base, layout, blocks, utilities, overrides;
+```
+
+- `reset` — minimal box-sizing / margin reset
+- `tokens` — all `--*` custom properties
+- `base` — element defaults (body, headings, links)
+- `layout` — header, footer, section grid
+- `blocks` — each block's CSS auto-assigned to this layer via `@import`
+- `utilities` — helper classes from `lazy-styles.css`
+- `overrides` — author/page-level one-off rules
+
+#### Typed Custom Properties (`@property`)
+Use `@property` for any token that needs animation or type coercion:
+
+```css
+@property --progress {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --hue {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 260deg;
+}
+```
+
+Required for animating gradients, progress indicators, and the theme-toggle colour transition.
+
+#### CSS Nesting
+Native nesting is fully supported. Use it in all block CSS files to keep selectors scoped without repetition:
+
+```css
+.accordion {
+  border: 1px solid var(--border-color);
+
+  & summary {
+    cursor: pointer;
+    padding: var(--spacing-2);
+  }
+
+  &[open] summary {
+    font-weight: 700;
+  }
+
+  @media (width >= 992px) {
+    padding: var(--spacing-3);
+  }
+}
+```
+
+Do **not** nest beyond three levels — keep specificity low and selectors readable.
+
+#### Container Queries (`@container`)
+Declare a containment context on the block wrapper so inner elements respond to the block's own width, not the viewport:
+
+```css
+.card {
+  container-type: inline-size;
+  container-name: card;
+}
+
+@container card (width >= 480px) {
+  .card .card-body { flex-direction: row; }
+}
+```
+
+Use container queries instead of viewport media queries for all layout decisions inside blocks.
+
+#### `:has()` Pseudo-class
+Use `:has()` to apply parent/sibling styles that previously required JavaScript:
+
+```css
+/* Highlight a form row that contains an invalid input */
+.form-row:has(input:invalid) label { color: var(--color-danger); }
+
+/* Remove bottom margin from last accordion item */
+.accordion:not(:has(+ .accordion)) { margin-bottom: 0; }
+```
+
+#### CSS Subgrid
+Where a block participates in a parent grid, opt-in to subgrid so columns align across rows:
+
+```css
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
+
+.card {
+  display: grid;
+  grid-row: span 3;
+  grid-template-rows: subgrid; /* heading, body, CTA always align */
+}
+```
+
+#### Viewport Units (`svh` / `dvh` / `lvh`)
+Use dynamic viewport units for full-bleed hero sections and modals to avoid the mobile browser chrome problem:
+
+```css
+.hero { min-height: 100dvh; }   /* shrinks/grows with browser UI */
+.modal { max-height: 90svh; }   /* safe area respecting */
+```
+
+Never use `100vh` for interactive full-bleed layouts.
+
+#### Logical Properties
+All margin, padding, border, and inset declarations must use logical properties:
+
+```css
+/* instead of: margin-left / margin-right */
+margin-inline: auto;
+padding-block: var(--spacing-3);
+border-inline-start: 4px solid var(--color-primary);
+inset-inline-start: 0;
+```
+
+#### Text Wrapping
+Apply to all headings and callout text to eliminate orphaned words:
+
+```css
+h1, h2, h3, .callout { text-wrap: balance; }
+p, li       { text-wrap: pretty; }
+```
+
+#### Scroll-Driven Animations
+Use `animation-timeline: scroll()` and `animation-timeline: view()` for progress indicators and reveal effects — no `IntersectionObserver` needed for purely cosmetic entrance animations:
+
+```css
+@keyframes reveal {
+  from { opacity: 0; translate: 0 1rem; }
+  to   { opacity: 1; translate: 0 0; }
+}
+
+.card {
+  animation: reveal linear both;
+  animation-timeline: view();
+  animation-range: entry 0% entry 30%;
+}
+```
+
+Reserve `IntersectionObserver` for logic-driven changes (lazy loading, active TOC highlighting).
+
+#### `@starting-style` (Enter Transitions)
+Animate elements from their initial state when they are first inserted into the DOM without JavaScript:
+
+```css
+.alert {
+  transition: opacity 200ms, translate 200ms;
+}
+
+@starting-style {
+  .alert { opacity: 0; translate: 0 -0.5rem; }
+}
+```
+
+#### `interpolate-size` for `height: auto` Animation
+Enable smooth height transitions for accordions and disclosures:
+
+```css
+:root {
+  interpolate-size: allow-keywords;
+}
+
+details { transition: height 250ms ease; }
+details[open] { height: auto; }
+```
+
+---
+
+### JavaScript / ES Modern Features
+
+#### Nullish Coalescing and Optional Chaining
+Prefer over `||` and manual null checks wherever sentinel `0` or `''` values are valid:
+
+```js
+const label = block.querySelector('h2')?.textContent ?? 'Untitled';
+const delay = config.delay ?? 300;
+```
+
+#### Nullish / Logical Assignment Operators
+Use for concise default-setting:
+
+```js
+config.speed ??= 200;       // set only if null/undefined
+el.dataset.theme ||= 'auto'; // set only if falsy
+```
+
+#### `structuredClone()`
+Deep-clone plain objects and arrays without `JSON.parse(JSON.stringify())`:
+
+```js
+const defaults = structuredClone(CONFIG_DEFAULTS);
+```
+
+#### `Object.hasOwn()`
+Prefer over `Object.prototype.hasOwnProperty.call()`:
+
+```js
+if (Object.hasOwn(options, 'variant')) { /* … */ }
+```
+
+#### `Object.groupBy()` / `Map.groupBy()`
+Group arrays without `reduce`:
+
+```js
+const byVariant = Object.groupBy(buttons, (b) => b.dataset.variant);
+```
+
+#### `Array.at()` and `Array.toSorted()` / `Array.toReversed()`
+Non-mutating alternatives to `sort()` and `reverse()`; safe on block-scoped data arrays:
+
+```js
+const last = items.at(-1);
+const sorted = items.toSorted((a, b) => a.label.localeCompare(b.label));
+```
+
+#### `Promise.withResolvers()`
+Exposes `{ promise, resolve, reject }` — cleaner than wrapping `new Promise`:
+
+```js
+const { promise, resolve } = Promise.withResolvers();
+img.addEventListener('load', resolve, { once: true });
+await promise;
+```
+
+#### `Promise.allSettled()`
+Use when fetching multiple independent fragments where partial failure is acceptable:
+
+```js
+const results = await Promise.allSettled(urls.map(fetch));
+const succeeded = results.filter((r) => r.status === 'fulfilled').map((r) => r.value);
+```
+
+#### Private Class Fields and Static Blocks
+Encapsulate block state in class instances where statefulness justifies a class:
+
+```js
+class ThemeManager {
+  #current = null;
+
+  static #instance;
+
+  static {
+    ThemeManager.#instance = new ThemeManager();
+  }
+
+  static getInstance() { return ThemeManager.#instance; }
+}
+```
+
+Prefer plain module-scoped closures for simple blocks; use classes only when multiple instances share coordinated state.
+
+#### `Set` Methods (`union`, `intersection`, `difference`, `isSubsetOf`)
+Useful for managing sets of active panels, selected items, or open modals:
+
+```js
+const active = new Set(['tab-1', 'tab-3']);
+const all = new Set(['tab-1', 'tab-2', 'tab-3']);
+const inactive = all.difference(active);
+```
+
+#### `AbortController` / `AbortSignal.timeout()`
+Cancel fetch requests and event listeners together; required pattern for blocks that load remote content:
+
+```js
+const controller = new AbortController();
+const { signal } = controller;
+
+const res = await fetch(url, { signal });
+el.addEventListener('click', handler, { signal });
+
+// Later: controller.abort() removes the listener and cancels the fetch atomically.
+```
+
+Use `AbortSignal.timeout(5000)` for simple one-off fetches:
+
+```js
+const res = await fetch(url, { signal: AbortSignal.timeout(5000) });
+```
+
+#### `WeakRef` and `FinalizationRegistry`
+Use `WeakRef` to hold references to DOM nodes in caches or cross-block communication channels without preventing garbage collection:
+
+```js
+const cache = new Map(); // key → WeakRef<Element>
+cache.set(id, new WeakRef(el));
+const el = cache.get(id)?.deref(); // undefined if GC'd
+```
+
+#### `import.meta.url` for Relative Asset Paths
+Load block-local assets (SVGs, workers) relative to the module file, not the page:
+
+```js
+const iconUrl = new URL('../icons/chevron.svg', import.meta.url).href;
+```
+
+#### `using` / `await using` (Explicit Resource Management)
+Automatically dispose of resources (timers, observers, event listeners) when a block is torn down. Supported in Chrome 124+, Firefox 127+, Safari 18.2+:
+
+```js
+function makeObserver(el, cb) {
+  const io = new IntersectionObserver(cb);
+  io.observe(el);
+  return { [Symbol.dispose]: () => io.disconnect() };
+}
+
+// In decorate():
+using obs = makeObserver(block, onIntersect);
+// obs.disconnect() is called automatically when decorate()'s scope exits
+```
+
+---
+
+### Browser Compatibility Notes
+
+| Feature | Chrome | Firefox | Safari | Notes |
+|---|---|---|---|---|
+| `rem()` / `mod()` / `round()` | 125 | 118 | 15.4 | All current stable |
+| `oklch()` / `color-mix()` | 111 | 113 | 15.4 | Baseline 2023 |
+| `light-dark()` | 123 | 120 | 17.5 | Baseline 2024 |
+| `@layer` | 99 | 97 | 15.4 | Baseline 2022 |
+| `@property` | 85 | 128 | 16.4 | Baseline 2024 |
+| CSS Nesting | 120 | 117 | 17.2 | Baseline 2024 |
+| Container queries | 105 | 110 | 16 | Baseline 2023 |
+| `:has()` | 105 | 121 | 15.4 | Baseline 2023 |
+| Subgrid | 117 | 71 | 16 | Baseline 2023 |
+| `svh` / `dvh` / `lvh` | 108 | 101 | 15.4 | Baseline 2023 |
+| Logical properties | 89 | 66 | 15 | Baseline 2023 |
+| `text-wrap: balance` | 114 | 121 | 17.4 | Baseline 2024 |
+| `text-wrap: pretty` | 117 | 128 | 18 | Baseline 2024 |
+| Scroll-driven animations | 115 | 110 | 18 | Baseline 2024 |
+| `@starting-style` | 117 | 129 | 17.5 | Baseline 2024 |
+| `interpolate-size` | 129 | 131 | 18.2 | Baseline 2025 |
+| Optional chaining / `??` | 80 | 74 | 13.1 | Baseline 2020 |
+| `structuredClone()` | 98 | 94 | 15.4 | Baseline 2022 |
+| `Object.hasOwn()` | 93 | 92 | 15.4 | Baseline 2022 |
+| `Object.groupBy()` | 117 | 119 | 17.4 | Baseline 2024 |
+| `Array.at()` / `toSorted()` | 110 | 115 | 16 | Baseline 2023 |
+| `Promise.withResolvers()` | 119 | 121 | 17.4 | Baseline 2024 |
+| Private class fields | 84 | 90 | 14.1 | Baseline 2021 |
+| `Set` methods (union etc.) | 122 | 127 | 17.4 | Baseline 2024 |
+| `AbortSignal.timeout()` | 103 | 100 | 15.4 | Baseline 2022 |
+| `WeakRef` | 84 | 79 | 14.1 | Baseline 2021 |
+| `using` / `await using` | 124 | 127 | 18.2 | Baseline 2025 |
+| `import.meta.url` | 64 | 62 | 11.1 | Baseline 2018 |
+
+All features target **Baseline 2025** or earlier. Nothing in this list requires a polyfill on current Chrome, Firefox, or Safari stable. Do **not** add transpilation (Babel, esbuild target) — EDS ships source directly.
+
+---
+
+## Open Items
+
+- [ ] Confirm font stack (user to provide).
+- [ ] Confirm colour palette (user to provide).
+- [ ] Decide navigation structure: flat top-nav vs. sidebar-nav on doc pages.
+- [ ] Decide whether forms page is a static demo or integrates with a form handler (e.g. AEM Forms / Helix Forms).
+- [ ] Confirm whether `modal` and `offcanvas` should share a single trigger mechanism or remain independent blocks.

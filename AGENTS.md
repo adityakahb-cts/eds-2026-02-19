@@ -40,7 +40,17 @@ The repository provides the basic structure, blocks, and configuration needed to
 ├── styles/          # Global styles and CSS
     ├── styles.css          # Minimal global styling and layout for your website required for LCP
     ├── lazy-styles.css     # Additional global styling and layout for below the fold/post LCP content
-    └── fonts.css           # Font definitions
+    ├── fonts.css           # Font definitions
+    └── config/
+        ├── colors.css      # Raw palette tokens (--color-{hue}-{shade})
+        ├── themes.css      # Semantic tokens mapped to light/dark mode
+        ├── typography.css  # Links, headings, body text, code, tables
+        ├── grid.css        # Container, row/col flex grid, CSS Grid classes
+        ├── forms.css       # Input, textarea, select, checkbox, radio
+        ├── globals.css     # Body, header/footer chrome, images, buttons, sections
+        ├── normalize.css   # CSS reset, box-sizing, interpolate-size
+        ├── utilities.css   # Display, flex, spacing, text, z-index, animation helpers
+        └── overrides.css   # Project-level token overrides — new developers edit only this file
 ├── scripts/         # JavaScript libraries and utilities
     ├── aem.js           # Core AEM Library for Edge Delivery page decoration logic (NEVER MODIFY THIS FILE)
     ├── scripts.js       # Global JavaScript utilities, main entry point for page decoration
@@ -65,12 +75,24 @@ The repository provides the basic structure, blocks, and configuration needed to
 ### CSS
 - Follow Stylelint standard configuration
 - Use modern CSS features (CSS Grid, Flexbox, CSS Custom Properties)
-- Maintain responsive design principles
-  - Declare styles mobile first, use `min-width` media queries at 600px/900px/1200px for tablet and desktop
+- **Mobile-first by default.** All base styles target the smallest viewport. Use `min-width` (`width >=`) media queries to progressively enhance for larger screens. Never use `max-width` queries.
+- Use the project's five standard breakpoints — always with the `width >=` syntax:
+
+  | Token | Value | Alias |
+  |---|---|---|
+  | `--breakpoint-sm` | `632px` | sm |
+  | `--breakpoint-md` | `760px` | md |
+  | `--breakpoint-lg` | `992px` | lg |
+  | `--breakpoint-xl` | `1272px` | xl |
+  | `--breakpoint-xxl` | `1432px` | xxl |
+
+  Note: CSS custom properties cannot be used inside `@media` rules — use the literal `px` values in media queries. The `--breakpoint-*` tokens are for JavaScript reference only.
+
 - Ensure all selectors are scoped to the block.
   - Bad: `.item-list`
-  - Good: `.{blockname} .item-list`   
+  - Good: `.{blockname} .item-list`
 - Avoid classes `{blockname}-container` and `{blockname}-wrapper` as those are used on sections and could be confusing.
+- **Project-wide CSS variable overrides go in `styles/config/overrides.css`** — it is loaded into the `overrides` cascade layer (highest priority) so no `!important` is needed. Block-level overrides belong on the block's own class selector, not on `:root`.
 
 ### HTML
 - Use semantic HTML5 elements
@@ -158,7 +180,12 @@ When adding a new block that requires browser-level testing, add a `{blockname}.
 - Ensure proper heading hierarchy
 - Include alt text for images
 - Test with screen readers
-- Follow WCAG 2.1 AA guidelines
+- Follow WCAG 2.1/2.2 Level AA guidelines
+- Use semantic color tokens from `styles/config/themes.css` for all color in blocks — never hardcode hex/rgb values
+- Text on backgrounds must meet ≥4.5:1 contrast (normal text) or ≥3:1 (large text / UI components)
+- Hover and active states must each meet ≥3:1 against the page background (use `--color-{state}-hover`, `--color-{state}-active`)
+- All interactive elements need a `:focus-visible` outline using `--color-{state}-focus` at `3px solid` (≥3:1 against adjacent background, WCAG 2.4.11 / 2.4.13)
+- Dark mode is handled automatically by the theme tokens — no per-block `prefers-color-scheme` media queries needed; use `data-eds-theme="dark"` / `"light"` on `<html>` for programmatic overrides
 
 ## Deployment
 

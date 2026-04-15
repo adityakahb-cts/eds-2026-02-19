@@ -126,58 +126,294 @@ Do not load fonts anywhere else. The `localhost` guard prevents sessionStorage f
 
 Loaded in the `<head>` — part of the critical path. Keep it minimal. Only styles required before LCP belong here.
 
+`styles.css` contains three things only:
+
+1. A `@layer` order declaration.
+2. `@import` statements loading the six config partials from `styles/config/`.
+3. The `:root` block with all design tokens.
+
+### Mobile-First Architecture
+
+This is a **mobile-first** project. All base styles target the smallest viewport (`< 632px`). Larger-screen styles are layered on top using `min-width` (`width >=`) media queries at the project's five breakpoints. Never use `max-width` queries.
+
+### Breakpoints
+
+| Token | Literal value | Alias |
+|---|---|---|
+| `--breakpoint-sm` | `632px` | sm |
+| `--breakpoint-md` | `760px` | md |
+| `--breakpoint-lg` | `992px` | lg |
+| `--breakpoint-xl` | `1272px` | xl |
+| `--breakpoint-xxl` | `1432px` | xxl |
+
+CSS custom properties cannot appear inside `@media` conditions. Always write the literal `px` value. The `--breakpoint-*` tokens exist for JavaScript use only.
+
+### Config Partials
+
+| File | Layer | Contents |
+|---|---|---|
+| `styles/config/normalize.css` | `reset` | Modern CSS reset, `box-sizing`, `interpolate-size` |
+| `styles/config/colors.css` | `base` | Raw color palette — `--color-{hue}-{0…900}` for all eight hues |
+| `styles/config/themes.css` | `base` | Semantic tokens for light and dark mode (`--color-primary`, `--color-danger`, …) |
+| `styles/config/typography.css` | `base` | Links, headings, body text, code, blockquote, tables |
+| `styles/config/grid.css` | `layout` | `.container`, `.row`/`.col` flex grid, `.grid` CSS Grid, responsive column classes |
+| `styles/config/forms.css` | `base` | Input, textarea, select, checkbox, radio, validation states |
+| `styles/config/globals.css` | `base` | `body`, header/footer chrome, images, icons, `.button`, sections |
+| `styles/config/utilities.css` | `utilities` | Display, flexbox, gap, spacing, text, position, z-index, border, animation |
+| `styles/config/overrides.css` | `overrides` | **Project-level token overrides** — the correct place to customise any `:root` design token for the project |
+
 ### CSS Custom Properties
 
-All design tokens are defined as custom properties on `:root`. The values change at the 900px desktop breakpoint.
+All design tokens are defined on `:root` in `styles.css`. Tokens never change at a breakpoint — responsive sizing is achieved with fluid `clamp()` values.
 
-#### Colors
+#### Color Architecture
 
-| Property | Value |
-|----------|-------|
-| `--background-color` | `white` |
-| `--light-color` | `#f8f8f8` |
-| `--dark-color` | `#505050` |
-| `--text-color` | `#131313` |
-| `--link-color` | `#3b63fb` |
-| `--link-hover-color` | `#1d3ecf` |
+The color system is split across four files:
+
+1. **`styles/config/colors.css`** — raw palette: `--color-{hue}-{shade}` for 10 shades (0, 100–900) across eight hues. Never use these directly in components.
+2. **`styles/config/themes.css`** — semantic tokens: maps palette shades to purpose-based names for light mode (`:root`) and dark mode (`@media (prefers-color-scheme: dark)` + `[data-eds-theme]` attribute). Use these in all new code.
+3. **`styles/styles.css` `:root`** — legacy bridge tokens (e.g. `--link-color`, `--background-color`) now delegate to the semantic tokens for backwards compatibility.
+4. **`styles/config/overrides.css`** — the single place for project-level token overrides. Because it is imported into the `overrides` cascade layer (the last layer declared in `styles.css`), any property defined here wins over all other layers without needing `!important`. New developers should start here when customising the project's design tokens.
+
+#### Palette — `--color-{hue}-{shade}`
+
+Eight hues, each with eleven shades. All values use `oklch()` for perceptual uniformity. Contrast ratios noted are against white (`--color-neutral-0`).
+
+| Hue | Palette name | Semantic role | Hue angle |
+|---|---|---|---|
+| Neutral | `--color-neutral-*` | page backgrounds, text, borders | `252` (cool gray) |
+| Blue | `--color-blue-*` | primary | `252` |
+| Violet | `--color-violet-*` | secondary | `288` |
+| Teal | `--color-teal-*` | tertiary | `194` |
+| Red | `--color-red-*` | danger | `24` |
+| Green | `--color-green-*` | success | `142` |
+| Sky | `--color-sky-*` | info | `221` |
+| Amber | `--color-amber-*` | warning | `83` |
+
+Shade thresholds (against white):
+
+| Shade | Approx. contrast on white | WCAG threshold met |
+|---|---|---|
+| `0` | 1.0:1 | — |
+| `100` | ~1.1:1 | — |
+| `200` | ~1.4:1 | — |
+| `300` | ~2.2:1 | — |
+| `400` | ~3.1:1 | ✓ AA non-text (UI components, 1.4.11) |
+| `500` | ~4.6:1 | ✓ AA normal text (1.4.3) |
+| `600` | ~6.9:1 | ✓ AA normal text |
+| `700` | ~10.9:1 | ✓ AA + AAA normal text |
+| `800` | ~18:1 | ✓ AAA |
+| `900` | ≥19:1 | ✓ AAA |
+
+> **Amber exception.** Yellow is inherently high-luminance. `--color-amber-600` reaches only ~3.3:1 against white (non-text AA). Use `--color-amber-700` or darker for text on a white background. Filled warning UI must use `--color-neutral-900` (dark) text on amber backgrounds.
+
+#### Semantic Tokens — Light Mode (default)
+
+Each semantic state exposes seven tokens. Use these in all component and block styles.
+
+| Token pattern | Purpose | WCAG criterion |
+|---|---|---|
+| `--color-{state}` | Filled background (buttons, badges, alerts) | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-hover` | Hover background | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-active` | Pressed/active background | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-text` | Text on filled background | 1.4.3 ≥4.5:1 against `--color-{state}` |
+| `--color-{state}-subtle` | Tinted page-area background (alert, chip) | — |
+| `--color-{state}-border` | Border for outlined / ghost variants | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-focus` | Focus-ring colour | 2.4.11 / 2.4.13 ≥3:1 on page bg |
+
+Available states: `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning`
+
+Surface tokens:
+
+| Token | Light mode | Dark mode |
+|---|---|---|
+| `--color-page-bg` | `neutral-0` (white) | `neutral-900` |
+| `--color-surface` | `neutral-100` | `neutral-800` |
+| `--color-surface-2` | `neutral-200` | `neutral-700` |
+| `--color-border` | `neutral-300` | `neutral-700` |
+| `--color-text` | `neutral-900` | `neutral-100` |
+| `--color-text-muted` | `neutral-600` | `neutral-400` |
+
+#### Dark Mode
+
+Dark mode activates automatically via `@media (prefers-color-scheme: dark)`. Use the `data-eds-theme` attribute on `<html>` to override the OS preference programmatically:
+
+```js
+// Force dark mode
+document.documentElement.setAttribute('data-eds-theme', 'dark');
+
+// Force light mode (even when OS prefers dark)
+document.documentElement.setAttribute('data-eds-theme', 'light');
+
+// Follow OS preference
+document.documentElement.removeAttribute('data-eds-theme');
+```
+
+| `data-eds-theme` value | Effect |
+|---|---|
+| `"dark"` | Forces dark tokens regardless of OS preference |
+| `"light"` | Forces light tokens even when OS prefers dark |
+| *(absent)* | Follows `prefers-color-scheme` automatically |
+
+In dark mode, semantic tokens shift to lighter palette shades so interactive elements remain legible against the dark page background:
+
+| State | Light `--color-{state}` | Dark `--color-{state}` |
+|---|---|---|
+| primary | `blue-600` | `blue-300` |
+| secondary | `violet-600` | `violet-300` |
+| tertiary | `teal-600` | `teal-300` |
+| danger | `red-600` | `red-300` |
+| success | `green-600` | `green-300` |
+| info | `sky-600` | `sky-300` |
+| warning | `amber-600` | `amber-400` |
+
+#### Legacy Bridge Tokens
+
+These exist in `styles/styles.css` `:root` for backwards compatibility with existing blocks. They delegate to the semantic tokens and automatically adapt to dark mode.
+
+| Legacy token | Resolves to |
+|---|---|
+| `--background-color` | `var(--color-page-bg)` |
+| `--surface-color` | `var(--color-surface)` |
+| `--light-color` | `var(--color-surface)` |
+| `--dark-color` | `var(--color-neutral-700)` |
+| `--text-color` | `var(--color-text)` |
+| `--muted-color` | `var(--color-text-muted)` |
+| `--border-color` | `var(--color-border)` |
+| `--link-color` | `var(--color-primary)` |
+| `--link-hover-color` | `var(--color-primary-hover)` |
+| `--accent-color` | `var(--color-primary)` |
+| `--accent-hover-color` | `var(--color-primary-hover)` |
+
+**Do not add new properties to the legacy bridge.** New code should use `--color-{state}` tokens directly.
+
+#### Adding or Extending Colors
+
+- **New palette shade** — add a `--color-{hue}-{shade}` property to `styles/config/colors.css`.
+- **New semantic state** — add a full set of seven tokens to both the `:root` (light) block and both dark-mode blocks in `styles/config/themes.css`.
+- **Project-wide token override** — put it in `styles/config/overrides.css`, which sits in the `overrides` cascade layer and wins over everything else. Always update both the light `:root` block and the two dark-mode blocks (`@media` + `[data-eds-theme="dark"]`) when overriding semantic color tokens:
+
+```css
+/* styles/config/overrides.css — intentional project-wide brand change */
+:root {
+  --color-primary:        var(--color-violet-600);
+  --color-primary-hover:  var(--color-violet-700);
+  --color-primary-active: var(--color-violet-800);
+  --color-primary-text:   var(--color-neutral-0);
+  --color-primary-subtle: var(--color-violet-100);
+  --color-primary-border: var(--color-violet-400);
+  --color-primary-focus:  var(--color-violet-700);
+}
+```
+
+- **Block-level token override** — scope the override to the block selector, not to `:root`. This keeps the change isolated to that one component:
+
+```css
+/* Good — scoped to one block */
+.my-block {
+  --color-primary: var(--color-teal-600);
+}
+
+/* Bad — putting a block-specific value in :root leaks it everywhere */
+:root {
+  --color-primary: var(--color-teal-600);
+}
+```
 
 #### Typography — Families
 
 | Property | Value |
-|----------|-------|
+|---|---|
 | `--body-font-family` | `roboto, roboto-fallback, sans-serif` |
 | `--heading-font-family` | `roboto-condensed, roboto-condensed-fallback, sans-serif` |
 
-#### Typography — Body Sizes
+#### Typography — Fluid Type Scale
 
-| Property | Mobile | Desktop (≥ 900px) |
-|----------|--------|-------------------|
-| `--body-font-size-m` | `22px` | `18px` |
-| `--body-font-size-s` | `19px` | `16px` |
-| `--body-font-size-xs` | `17px` | `14px` |
+All size tokens use `clamp(min, preferred, max)`. The minimum applies at `632px` (sm) and the maximum at `1432px` (xxl). Values scale linearly between those two points — no breakpoint overrides needed.
 
-#### Typography — Heading Sizes
+| Token | Min (632px) | Max (1432px) |
+|---|---|---|
+| `--font-size-display1` | `2rem / 32px` | `3.25rem / 52px` |
+| `--font-size-display2` | `1.875rem / 30px` | `3rem / 48px` |
+| `--font-size-display3` | `1.75rem / 28px` | `2.75rem / 44px` |
+| `--font-size-display4` | `1.625rem / 26px` | `2.5rem / 40px` |
+| `--font-size-display5` | `1.5rem / 24px` | `2.25rem / 36px` |
+| `--font-size-display6` | `1.375rem / 22px` | `2rem / 32px` |
+| `--font-size-h1` | `1.75rem / 28px` | `3rem / 48px` |
+| `--font-size-h2` | `1.625rem / 26px` | `2.5rem / 40px` |
+| `--font-size-h3` | `1.5rem / 24px` | `2.25rem / 36px` |
+| `--font-size-h4` | `1.375rem / 22px` | `2rem / 32px` |
+| `--font-size-h5` | `1.25rem / 20px` | `1.75rem / 28px` |
+| `--font-size-h6` | `1.125rem / 18px` | `1.5rem / 24px` |
+| `--font-size-intro` | `1.25rem / 20px` | `1.75rem / 28px` |
+| `--font-size-p` | `1rem / 16px` | `1.25rem / 20px` |
+| `--font-size-small` | `0.875rem / 14px` | `1rem / 16px` |
 
-| Property | Mobile | Desktop (≥ 900px) |
-|----------|--------|-------------------|
-| `--heading-font-size-xxl` | `55px` | `45px` |
-| `--heading-font-size-xl` | `44px` | `36px` |
-| `--heading-font-size-l` | `34px` | `28px` |
-| `--heading-font-size-m` | `27px` | `22px` |
-| `--heading-font-size-s` | `24px` | `20px` |
-| `--heading-font-size-xs` | `22px` | `18px` |
+#### Spacing
+
+| Token | Value |
+|---|---|
+| `--spacing-1` | `0.25rem` (4px) |
+| `--spacing-2` | `0.5rem` (8px) |
+| `--spacing-3` | `1rem` (16px) |
+| `--spacing-4` | `1.5rem` (24px) |
+| `--spacing-5` | `3rem` (48px) |
+
+#### Border Radius
+
+| Token | Value |
+|---|---|
+| `--border-radius-s` | `0.25rem` |
+| `--border-radius-m` | `0.5rem` |
+| `--border-radius-l` | `1rem` |
+| `--border-radius-pill` | `50rem` |
+| `--border-radius-circle` | `50%` |
+
+#### Shadows
+
+| Token | Value |
+|---|---|
+| `--shadow-s` | subtle 1px/2px shadow |
+| `--shadow-m` | medium 4px/6px shadow |
+| `--shadow-l` | large 10px/15px shadow |
+
+#### Z-index Scale
+
+| Token | Value | Intended use |
+|---|---|---|
+| `--z-below` | `-1` | Behind background |
+| `--z-base` | `0` | Normal flow |
+| `--z-raised` | `10` | Cards, lifted elements |
+| `--z-dropdown` | `100` | Dropdowns, popovers |
+| `--z-sticky` | `200` | Sticky headers |
+| `--z-fixed` | `300` | Fixed navigation |
+| `--z-overlay` | `400` | Overlay backdrops |
+| `--z-modal` | `500` | Modal dialogs |
+| `--z-popover` | `600` | Tooltips, popovers |
+| `--z-toast` | `700` | Toast notifications |
+
+#### Transitions
+
+| Token | Value |
+|---|---|
+| `--transition-speed` | `200ms` |
+| `--transition-ease` | `ease` |
+| `--transition-base` | `200ms ease` |
 
 #### Layout
 
-| Property | Value |
-|----------|-------|
+| Token | Value |
+|---|---|
 | `--nav-height` | `64px` |
+| `--max-width` | `120rem` (1920px) |
+| `--grid-columns` | `12` |
+| `--grid-gutter-width` | `3rem` (48px) |
 
 ### Adding New Custom Properties
 
-Add new tokens to the `:root` block at the top of `styles.css`. If the value changes at the desktop breakpoint, add it to the `@media (width >= 900px)` `:root` override block directly below.
+Add new tokens to the `:root` block in `styles.css`. Follow the naming convention `--{category}-{qualifier}` (e.g. `--spacing-xl`, `--border-radius-m`).
 
-Use the established naming convention: `--{category}-{qualifier}` (e.g. `--spacing-xl`, `--border-radius-m`).
+**Do not add breakpoint-specific overrides.** The design token system uses fluid `clamp()` values for type sizes and static values for everything else. If a value must differ across viewports, use a fluid expression directly in the token value rather than repeating the token at each breakpoint.
 
 ### Section System
 
@@ -193,7 +429,7 @@ The framework wraps each section of authored content in nested divs:
 </main>
 ```
 
-The content wrapper (`main > .section > div`) has a maximum width of `1200px`, is horizontally centered, and has horizontal padding (24px mobile, 32px desktop). Do not override these rules inside blocks — blocks that need full-bleed layouts should use negative margins or the section wrapper instead.
+The content wrapper (`main > .section > div`) has a maximum width of `1200px`, is horizontally centered, and has horizontal padding (`24px` mobile, `32px` at `992px` and up). Do not override these rules inside blocks — blocks that need full-bleed layouts should use negative margins or the section wrapper instead.
 
 ### Section Metadata Styles
 

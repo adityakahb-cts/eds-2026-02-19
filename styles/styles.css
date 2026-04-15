@@ -10,37 +10,143 @@
  * governing permissions and limitations under the License.
  */
 
-:root {
-  /* colors */
-  --background-color: white;
-  --light-color: #f8f8f8;
-  --dark-color: #505050;
-  --text-color: #131313;
-  --link-color: #3b63fb;
-  --link-hover-color: #1d3ecf;
+/* ─── Cascade layer order ─────────────────────────────────────────────────── */
+@layer reset, base, layout, blocks, utilities, overrides;
 
-  /* fonts */
+/* ─── Config imports ──────────────────────────────────────────────────────── */
+@import url('config/normalize.css') layer(reset);
+@import url('config/colors.css') layer(base);
+@import url('config/themes.css') layer(base);
+@import url('config/typography.css') layer(base);
+@import url('config/grid.css') layer(layout);
+@import url('config/forms.css') layer(base);
+@import url('config/globals.css') layer(base);
+@import url('config/utilities.css') layer(utilities);
+@import url('config/overrides.css') layer(overrides);
+
+/* ─── Design tokens ───────────────────────────────────────────────────────── */
+:root {
+  /* breakpoints — JS reference only; use literal px values in @media rules */
+  --breakpoint-sm: 632px;
+  --breakpoint-md: 760px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1272px;
+  --breakpoint-xxl: 1432px;
+
+  /* ── Colors ── */
+
+  /*
+   * Legacy bridge tokens — these point to the semantic layer defined in
+   * config/themes.css, which in turn references the palette in config/colors.css.
+   * All legacy consumers (globals.css, blocks, etc.) continue to work unchanged.
+   * For new code prefer the semantic tokens (--color-primary, --color-danger, …).
+   */
+  --background-color: var(--color-page-bg);
+  --surface-color:    var(--color-surface);
+  --light-color:      var(--color-surface);
+  --dark-color:       var(--color-neutral-700);
+  --text-color:       var(--color-text);
+  --muted-color:      var(--color-text-muted);
+  --border-color:     var(--color-border);
+  --link-color:       var(--color-primary);
+  --link-hover-color: var(--color-primary-hover);
+  --accent-color:     var(--color-primary);
+  --accent-hover-color: var(--color-primary-hover);
+
+  /* ── Fonts ── */
   --body-font-family: roboto, roboto-fallback, sans-serif;
   --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
 
-  /* body sizes */
-  --body-font-size-m: 22px;
-  --body-font-size-s: 19px;
-  --body-font-size-xs: 17px;
+  /* ── Fluid type scale ──────────────────────────────────────────────────────
+   * clamp(min-size, preferred, max-size)
+   * min-size applied at 632 px (sm), max-size at 1432 px (xxl).
+   * Preferred = intercept + slope·vw, ensuring exact values at both endpoints.
+   * ────────────────────────────────────────────────────────────────────────── */
 
-  /* heading sizes */
-  --heading-font-size-xxl: 55px;
-  --heading-font-size-xl: 44px;
-  --heading-font-size-l: 34px;
-  --heading-font-size-m: 27px;
-  --heading-font-size-s: 24px;
-  --heading-font-size-xs: 22px;
+  /* display */
+  --font-size-display1: clamp(2rem, 1.0125rem + 2.5vw, 3.25rem);
+  --font-size-display2: clamp(1.875rem, 0.9863rem + 2.25vw, 3rem);
+  --font-size-display3: clamp(1.75rem, 0.96rem + 2vw, 2.75rem);
+  --font-size-display4: clamp(1.625rem, 0.9338rem + 1.75vw, 2.5rem);
+  --font-size-display5: clamp(1.5rem, 0.9075rem + 1.5vw, 2.25rem);
+  --font-size-display6: clamp(1.375rem, 0.8813rem + 1.25vw, 2rem);
 
-  /* nav height */
+  /* headings */
+  --font-size-h1: clamp(1.75rem, 0.7625rem + 2.5vw, 3rem);
+  --font-size-h2: clamp(1.625rem, 0.9338rem + 1.75vw, 2.5rem);
+  --font-size-h3: clamp(1.5rem, 0.9075rem + 1.5vw, 2.25rem);
+  --font-size-h4: clamp(1.375rem, 0.8813rem + 1.25vw, 2rem);
+  --font-size-h5: clamp(1.25rem, 0.855rem + 1vw, 1.75rem);
+  --font-size-h6: clamp(1.125rem, 0.8288rem + 0.75vw, 1.5rem);
+
+  /* body / prose */
+  --font-size-intro: clamp(1.25rem, 0.855rem + 1vw, 1.75rem);
+  --font-size-p: clamp(1rem, 0.8025rem + 0.5vw, 1.25rem);
+  --font-size-small: clamp(0.875rem, 0.7763rem + 0.25vw, 1rem);
+
+  /* ── Spacing (base-4 scale) ── */
+  --spacing-1: 0.25rem;    /*  4 px */
+  --spacing-2: 0.5rem;     /*  8 px */
+  --spacing-3: 1rem;       /* 16 px */
+  --spacing-4: 1.5rem;     /* 24 px */
+  --spacing-5: 3rem;       /* 48 px */
+
+  /* ── Border radius ── */
+  --border-radius-s: 0.25rem;
+  --border-radius-m: 0.5rem;
+  --border-radius-l: 1rem;
+  --border-radius-pill: 50rem;
+  --border-radius-circle: 50%;
+
+  /* ── Shadows ── */
+  --shadow-s: 0 1px 3px oklch(0% 0 0deg / 12%), 0 1px 2px oklch(0% 0 0deg / 8%);
+  --shadow-m: 0 4px 6px oklch(0% 0 0deg / 10%), 0 2px 4px oklch(0% 0 0deg / 8%);
+  --shadow-l: 0 10px 15px oklch(0% 0 0deg / 10%), 0 4px 6px oklch(0% 0 0deg / 8%);
+
+  /* ── Transitions ── */
+  --transition-speed: 200ms;
+  --transition-ease: ease;
+  --transition-base: var(--transition-speed) var(--transition-ease);
+
+  /* ── Z-index scale ── */
+  --z-below:    -1;
+  --z-base:      0;
+  --z-raised:   10;
+  --z-dropdown: 100;
+  --z-sticky:   200;
+  --z-fixed:    300;
+  --z-overlay:  400;
+  --z-modal:    500;
+  --z-popover:  600;
+  --z-toast:    700;
+
+  /* ── Container max-widths (px → rem at 16 px base) ── */
+  --container-max-width-sm:  37.5rem;   /*  600 px */
+  --container-max-width-md:  45rem;     /*  720 px */
+  --container-max-width-lg:  60rem;     /*  960 px */
+  --container-max-width-xl:  71.25rem;  /* 1140 px */
+  --container-max-width-xxl: 87.5rem;   /* 1400 px */
+
+  /* ── Grid ── */
+  --grid-gutter-width: 3rem;   /* 48 px */
+  --grid-row-columns: 6;
+  --grid-columns: 12;
+
+  /* ── Widths ── */
+  --width-25:   25%;
+  --width-50:   50%;
+  --width-75:   75%;
+  --width-100: 100%;
+  --width-auto: auto;
+
+  /* ── Site max-width ── */
+  --max-width: 120rem;   /* 1920 px */
+
+  /* ── Nav ── */
   --nav-height: 64px;
 }
 
-/* fallback fonts */
+/* ─── Fallback fonts (kept here — needed before first paint) ─────────────── */
 @font-face {
   font-family: roboto-condensed-fallback;
   size-adjust: 88.82%;
@@ -51,207 +157,4 @@
   font-family: roboto-fallback;
   size-adjust: 99.529%;
   src: local('Arial');
-}
-
-@media (width >= 900px) {
-  :root {
-    /* body sizes */
-    --body-font-size-m: 18px;
-    --body-font-size-s: 16px;
-    --body-font-size-xs: 14px;
-
-    /* heading sizes */
-    --heading-font-size-xxl: 45px;
-    --heading-font-size-xl: 36px;
-    --heading-font-size-l: 28px;
-    --heading-font-size-m: 22px;
-    --heading-font-size-s: 20px;
-    --heading-font-size-xs: 18px;
-  }
-}
-
-body {
-  display: none;
-  margin: 0;
-  background-color: var(--background-color);
-  color: var(--text-color);
-  font-family: var(--body-font-family);
-  font-size: var(--body-font-size-m);
-  line-height: 1.6;
-}
-
-body.appear {
-  display: block;
-}
-
-header {
-  height: var(--nav-height);
-}
-
-header .header,
-footer .footer {
-  visibility: hidden;
-}
-
-header .header[data-block-status="loaded"],
-footer .footer[data-block-status="loaded"] {
-  visibility: visible;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
-  font-family: var(--heading-font-family);
-  font-weight: 600;
-  line-height: 1.25;
-  scroll-margin: 40px;
-}
-
-h1 { font-size: var(--heading-font-size-xxl); }
-h2 { font-size: var(--heading-font-size-xl); }
-h3 { font-size: var(--heading-font-size-l); }
-h4 { font-size: var(--heading-font-size-m); }
-h5 { font-size: var(--heading-font-size-s); }
-h6 { font-size: var(--heading-font-size-xs); }
-
-p,
-dl,
-ol,
-ul,
-pre,
-blockquote {
-  margin-top: 0.8em;
-  margin-bottom: 0.25em;
-}
-
-code,
-pre {
-  font-size: var(--body-font-size-s);
-}
-
-pre {
-  padding: 16px;
-  border-radius: 8px;
-  background-color: var(--light-color);
-  overflow-x: auto;
-  white-space: pre;
-}
-
-main > div {
-  margin: 40px 16px;
-}
-
-input,
-textarea,
-select,
-button {
-  font: inherit;
-}
-
-/* links */
-a:any-link {
-  color: var(--link-color);
-  text-decoration: none;
-  overflow-wrap: break-word;
-}
-
-a:hover {
-  color: var(--link-hover-color);
-  text-decoration: underline;
-}
-
-/* buttons */
-a.button:any-link,
-button {
-  box-sizing: border-box;
-  display: inline-block;
-  max-width: 100%;
-  margin: 12px 0;
-  border: 2px solid transparent;
-  border-radius: 2.4em;
-  padding: 0.5em 1.2em;
-  font-family: var(--body-font-family);
-  font-style: normal;
-  font-weight: 500;
-  line-height: 1.25;
-  text-align: center;
-  text-decoration: none;
-  background-color: var(--link-color);
-  color: var(--background-color);
-  cursor: pointer;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-a.button:hover,
-a.button:focus,
-button:hover,
-button:focus {
-  background-color: var(--link-hover-color);
-  cursor: pointer;
-}
-
-button:disabled,
-button:disabled:hover {
-  background-color: var(--light-color);
-  cursor: unset;
-}
-
-a.button.secondary,
-button.secondary {
-  background-color: unset;
-  border: 2px solid currentcolor;
-  color: var(--text-color);
-}
-
-main img {
-  max-width: 100%;
-  width: auto;
-  height: auto;
-}
-
-.icon {
-  display: inline-block;
-  height: 24px;
-  width: 24px;
-}
-
-.icon img {
-  height: 100%;
-  width: 100%;
-}
-
-/* sections */
-main > .section {
-  margin: 40px 0;
-}
-
-main > .section > div {
-  max-width: 1200px;
-  margin: auto;
-  padding: 0 24px;
-}
-
-main > .section:first-of-type {
-  margin-top: 0;
-}
-
-@media (width >= 900px) {
-  main > .section > div {
-    padding: 0 32px;
-  }
-}
-
-/* section metadata */
-main .section.light,
-main .section.highlight {
-  background-color: var(--light-color);
-  margin: 0;
-  padding: 40px 0;
 }

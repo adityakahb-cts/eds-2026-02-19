@@ -1,8 +1,8 @@
 import { getMetadata } from '../../scripts/aem.js';
 import { loadFragment } from '../fragment/fragment.js';
 
-// media query match that indicates mobile/tablet width
-const isDesktop = window.matchMedia('(min-width: 900px)');
+// media query match that indicates desktop width (lg breakpoint: 992px)
+const isDesktop = window.matchMedia('(min-width: 992px)');
 
 /**
  * Collapses the expanded nav section or closes the mobile menu when Escape is pressed.

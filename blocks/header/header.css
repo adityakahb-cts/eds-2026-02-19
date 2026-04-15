@@ -2,7 +2,7 @@
 header .nav-wrapper {
   background-color: var(--background-color);
   width: 100%;
-  z-index: 2;
+  z-index: var(--z-fixed);
   position: fixed;
 }
 
@@ -30,7 +30,7 @@ header nav[aria-expanded='true'] {
   min-height: 100dvh;
 }
 
-@media (width >= 900px) {
+@media (width >= 992px) {
   header .nav-wrapper {
     position: relative;
   }
@@ -132,7 +132,7 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
   transform: rotate(-45deg);
 }
 
-@media (width >= 900px) {
+@media (width >= 992px) {
   header nav .nav-hamburger {
     display: none;
     visibility: hidden;
@@ -143,7 +143,7 @@ header nav[aria-expanded='true'] .nav-hamburger-icon::after {
 header .nav-brand {
   grid-area: brand;
   flex-basis: 128px;
-  font-size: var(--heading-font-size-s);
+  font-size: var(--font-size-h5);
   font-weight: 700;
   line-height: 1;
 }
@@ -170,7 +170,7 @@ header nav[aria-expanded='true'] .nav-sections {
 header nav .nav-sections ul {
   list-style: none;
   padding-left: 0;
-  font-size: var(--body-font-size-s);
+  font-size: var(--font-size-p);
 }
 
 header nav .nav-sections ul > li {
@@ -185,7 +185,7 @@ header nav .nav-sections ul > li > ul > li {
   font-weight: 400;
 }
 
-@media (width >= 900px) {
+@media (width >= 992px) {
   header nav .nav-sections {
     display: block;
     visibility: visible;
