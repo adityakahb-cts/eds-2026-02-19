@@ -117,6 +117,7 @@ export const ITEM_MARKUP = /* html */`
 Rules for `markup.js`:
 - Export at least one named const (conventionally `MARKUP` for the block root).
 - Export additional named consts for repeating child templates (e.g. `ITEM_MARKUP`).
+- Always add a default export equal to the primary (root) markup const — `export default MARKUP;`.
 - Use `{placeholder}` tokens for every value that comes from authored content.
 - The `/* html */` comment before the template string enables syntax highlighting in editors that support it — always include it.
 - Do **not** import anything in `markup.js`. It must be a pure data file with no side effects.
@@ -212,6 +213,16 @@ export default async function decorate(block) {
 ```
 
 Follow this four-step order inside every `decorate` function. Steps that don't apply can be omitted, but never reorder them — event listeners must not be attached before the DOM exists.
+
+## Following block.md When Modifying a Block
+
+Before changing any block's `.js` or `.css` file, **read that block's `block.md` first**. The `block.md` is the authoritative contract for what the block receives from the CMS. Modifying code without reading it risks breaking pages that are already authored against the documented structure.
+
+Rules:
+- Read `blocks/{name}/block.md` before touching `{name}.js` or `{name}.css`.
+- Do not change the expected authored structure (rows, cells, field order) without also updating `block.md` and the test file to match.
+- If a field is added, removed, or made required/optional, update `block.md` first, then update the JS and tests together.
+- CSS changes that rename or remove class names used in authored content or other blocks must also be reflected in `block.md` if those classes are part of the documented output.
 
 ## Inspecting Authored Markup
 
@@ -392,7 +403,7 @@ Wrap the entire decoration in a try/catch if the block has complex logic, and lo
 ## Code Style
 
 - JavaScript: ES6+ (arrow functions, destructuring, template literals, optional chaining).
-- Follow the Airbnb ESLint ruleset (configured in `.eslintrc.js`).
+- Follow the Airbnb ESLint ruleset (configured in `eslint.config.mjs`).
 - Always include `.js` extensions in import paths.
 - Use Unix line endings (LF).
 - CSS: follow the Stylelint standard configuration.
@@ -583,6 +594,17 @@ Regardless of framework, every block test must cover:
 2. **Empty block** — block with no rows does not throw and renders valid (possibly empty) HTML.
 3. **Missing optional fields** — omitting optional cells or elements does not throw.
 4. **Repeating items** — multiple rows each produce the correct number of child elements.
+
+### Keeping Tests in Sync
+
+**Every time block code changes, the test file must be updated.** This is a hard requirement:
+
+- If the DOM structure produced by `decorate` changes, update the selectors and assertions in the test.
+- If a new authored field is added or removed, add or remove the corresponding test case.
+- If `markup.js` tokens change, update any tests that assert on rendered HTML.
+- If a new edge case or bug fix is introduced, add a regression test for it.
+
+A test file that no longer reflects the current block behaviour is treated as broken and must be fixed before committing.
 
 ---
 

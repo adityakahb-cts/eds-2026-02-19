@@ -30,5 +30,7 @@ For draft/test content with no CMS page, create files in `drafts/` and start the
 ### Project Rules
 
 Always check the `docs/` folder for coding standards and rules before writing or modifying any code:
-- `docs/block.md` — standards for all block development (directory structure, markup.js pattern, decoration, CSS, accessibility, testing)
+- `docs/blocks.md` — standards for all block development (directory structure, markup.js pattern, decoration, CSS, accessibility, testing)
 - `docs/global.md` — guide for modifying global scripts and styles
+
+Before modifying any block's `.js` or `.css`, read that block's own `block.md` file first. It defines the authored content model and is the contract between authors and code — changes to block structure must keep `block.md` and the test file in sync.

@@ -89,7 +89,9 @@ Blocks are the re-usable building blocks of AEM. Blocks add styling and function
 
 The initial content structure is important because it impacts how the author will create the content and how you will write your code to decorate it. In some sense, you can think of this structure as the contract for your block between the author and the developer. You should decide on this initial structure before writing any code, and be careful when making changes to code that makes assumptions about that structure as it could break existing pages.
 
-Every block must have a `block.md` file that documents the content model as a da.live-style block table — a markdown table with the block name in the first row, followed by rows describing each authored field with `*(required)*` or `*(optional)*` markers. All supported block variations must also be documented, each as a separate table using the `Block Name (variation-name)` syntax. See `docs/block.md` for the full format specification and examples.
+Every block must have a `block.md` file that documents the content model as a da.live-style block table — a markdown table with the block name in the first row, followed by rows describing each authored field with `*(required)*` or `*(optional)*` markers. All supported block variations must also be documented, each as a separate table using the `Block Name (variation-name)` syntax. See `docs/blocks.md` for the full format specification and examples.
+
+**Before modifying any block's `.js` or `.css` file, read that block's `block.md` first.** It is the authoritative contract for the block's authored structure. Any change to the expected rows, cells, or field order must be reflected in `block.md` and the block's test file before the code change is committed.
 
 The block javascript should export a default function which is called to perform the block decoration:
 
