@@ -25,6 +25,7 @@
     "@babel/eslint-parser": "^7.28.0",
     "@eslint/eslintrc": "^3.0.0",
     "@eslint/js": "^9.0.0",
+    "@playwright/test": "^1.52.0",
     "globals": "^16.0.0"
   },
   "overrides": {
@@ -33,7 +34,6 @@
     }
   },
   "devDependencies": {
-    "@playwright/test": "^1.52.0",
     "eslint": "^9.0.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-plugin-import": "^2.32.0",
