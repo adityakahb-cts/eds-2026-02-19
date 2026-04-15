@@ -14,6 +14,21 @@ import {
 } from './aem.js';
 
 /**
+ * Encodes a plain-text string for safe use inside an HTML attribute value.
+ * Use this when interpolating text into markup template attribute values.
+ * @param {string} str The plain text to encode
+ * @returns {string} HTML-encoded string safe for attribute values
+ */
+export function encodeHtml(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/**
  * Builds hero block and prepends to main in a new section.
  * @param {Element} main The container element
  */

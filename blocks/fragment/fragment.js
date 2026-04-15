@@ -23,6 +23,7 @@ export async function loadFragment(path) {
     const resp = await fetch(`${path}.plain.html`);
     if (resp.ok) {
       const main = document.createElement('main');
+      // Safe: same-origin path validated above; content is CMS-authored .plain.html, not user input
       main.innerHTML = await resp.text();
 
       // reset base path for media to fragment base

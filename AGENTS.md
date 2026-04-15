@@ -29,8 +29,11 @@ The repository provides the basic structure, blocks, and configuration needed to
 ```
 ├── blocks/          # Reusable content blocks
     └── {blockname}/   - Individual block directory
+        ├── block.md            # Content model documentation (required)
         ├── {blockname}.js      # Block's JavaScript
-        └── {blockname}.css     # Block's styles
+        ├── {blockname}.css     # Block's styles
+        ├── markup.js           # Block HTML template with interpolation
+        └── {blockname}.test.js # Jest unit tests (or .spec.js for Playwright)
 ├── styles/          # Global styles and CSS
     ├── styles.css          # Minimal global styling and layout for your website required for LCP
     ├── lazy-styles.css     # Additional global styling and layout for below the fold/post LCP content
@@ -85,6 +88,8 @@ You can inspect the contents of any page with `curl http://localhost:3000/path/t
 Blocks are the re-usable building blocks of AEM. Blocks add styling and functionality to content. Each block has an initial content structure it expects, and transforms the html in the block using DOM APIs to render a final structure. 
 
 The initial content structure is important because it impacts how the author will create the content and how you will write your code to decorate it. In some sense, you can think of this structure as the contract for your block between the author and the developer. You should decide on this initial structure before writing any code, and be careful when making changes to code that makes assumptions about that structure as it could break existing pages.
+
+Every block must have a `block.md` file that documents the content model as a da.live-style block table — a markdown table with the block name in the first row, followed by rows describing each authored field with `*(required)*` or `*(optional)*` markers. All supported block variations must also be documented, each as a separate table using the `Block Name (variation-name)` syntax. See `docs/block.md` for the full format specification and examples.
 
 The block javascript should export a default function which is called to perform the block decoration:
 
