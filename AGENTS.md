@@ -23,6 +23,9 @@ The repository provides the basic structure, blocks, and configuration needed to
   - The dev server runs at `http://localhost:3000` with auto-reload. Open it in playwright, puppeteer, or a browser. If none are available, ask the human to open it and give feedback.
 - Run linting before committing: `npm run lint`
 - Auto-Fix linting issues: `npm run lint:fix`
+- Run Playwright end-to-end tests: `npm run test:e2e` (starts the dev server automatically)
+- Open Playwright interactive UI: `npm run test:e2e:ui`
+- Install Playwright browsers (first run only): `npx playwright install`
 
 ## Project Structure
 
@@ -33,7 +36,7 @@ The repository provides the basic structure, blocks, and configuration needed to
         ├── {blockname}.js      # Block's JavaScript
         ├── {blockname}.css     # Block's styles
         ├── markup.js           # Block HTML template with interpolation
-        └── {blockname}.test.js # Jest unit tests (or .spec.js for Playwright)
+        └── {blockname}.spec.js # Playwright end-to-end tests
 ├── styles/          # Global styles and CSS
     ├── styles.css          # Minimal global styling and layout for your website required for LCP
     ├── lazy-styles.css     # Additional global styling and layout for below the fold/post LCP content
@@ -80,7 +83,7 @@ The repository provides the basic structure, blocks, and configuration needed to
 
 CMS authored content is a key part of every AEM Website. The content of a page is broken into sections. Sections can have default content (text, headings, links, etc.) as well as content in blocks.
 
-If no authored content exists to test against, you can create static HTML files in a `drafts/` folder at the project root. Pass `--html-folder drafts` when starting the dev server. Follow the aem markup structure and save files with `.html` or `.plain.html` extensions.
+If no authored content exists to test against, you can create static HTML files in a `tests/` folder at the project root. Pass `--html-folder tests` when starting the dev server. Follow the aem markup structure and save files with `.html` or `.plain.html` extensions.
 
 Background on content and markup structure can be found at https://www.aem.live/developer/markup-sections-blocks and https://www.aem.live/developer/markup-reference respectively.
 
@@ -128,6 +131,22 @@ Pages are progressively loaded in three phases to maximize performance. This pro
 * Delayed - load things that can be safely loaded later here and incur a performance penalty when loaded earlier
 
 ## Testing & Quality Assurance
+
+### Playwright End-to-End Tests
+
+`playwright.config.js` is pre-configured at the project root. It discovers all `blocks/**/*.spec.js` files and starts the AEM dev server (`http://localhost:3000`) automatically before each run.
+
+Draft pages used by the specs live in `tests/`. Each draft page sets `<meta name="nav">` and `<meta name="footer">` to local draft fragments so tests are fully self-contained without a live CMS.
+
+Current spec files:
+
+| Spec | Draft page | What it tests |
+|---|---|---|
+| `blocks/fragment/fragment.spec.js` | `tests/fragment-test.html` | Fragment content renders; original link removed after decoration |
+| `blocks/header/header.spec.js` | `tests/header-test.html` | nav-wrapper, nav#nav, hamburger button, brand/sections/tools, mobile toggle |
+| `blocks/footer/footer.spec.js` | `tests/footer-test.html` | Footer wrapper rendered; fragment content visible |
+
+When adding a new block that requires browser-level testing, add a `{blockname}.spec.js` alongside the existing test files and a matching draft page in `tests/`.
 
 ### Performance
 - Follow AEM Edge Delivery performance best practices https://www.aem.live/developer/keeping-it-100

@@ -13,7 +13,7 @@ blocks/
     ├── my-block.js      # decoration logic
     ├── my-block.css     # scoped styles
     ├── markup.js        # block HTML template with interpolation
-    └── my-block.test.js # Jest unit tests  (or my-block.spec.js for Playwright)
+    └── my-block.spec.js # Playwright end-to-end tests
 ```
 
 Block names must be lowercase and hyphenated (e.g. `card-list`, not `cardList` or `card_list`).
@@ -470,147 +470,27 @@ Dependencies shared across multiple blocks belong in `scripts/scripts.js` or `sc
 
 ## Testing
 
-Every block must ship with a test file co-located in its directory. Choose **Jest** for unit-testing decoration logic in isolation, or **Playwright** for integration tests that run against the live dev server. Both are acceptable; use the one that fits the block's complexity.
+Every block must ship with a Playwright spec file co-located in its directory (`my-block.spec.js`). Playwright tests run in a real browser against the live dev server and cover the full render pipeline — decoration logic, DOM output, user interactions, and accessibility attributes.
 
-| Framework | File name | Best for |
-|-----------|-----------|----------|
-| Jest | `my-block.test.js` | DOM transformation logic, markup interpolation, pure functions |
-| Playwright | `my-block.spec.js` | Full render in a real browser, visual output, user interactions |
+### Setup
 
-### Setup — Jest
-
-Install Jest with the jsdom environment and Babel for ES module support:
+`playwright.config.js` is pre-configured at the project root. Before running tests for the first time, install the browser binaries:
 
 ```sh
-npm install --save-dev jest jest-environment-jsdom @babel/core @babel/preset-env babel-jest
-```
-
-Add to `package.json`:
-
-```json
-{
-  "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch"
-  },
-  "jest": {
-    "testEnvironment": "jsdom",
-    "transform": {
-      "^.+\\.js$": "babel-jest"
-    },
-    "moduleNameMapper": {
-      "^(\\.{1,2}/.*)\\.js$": "$1"
-    }
-  }
-}
-```
-
-Add `babel.config.json`:
-
-```json
-{
-  "presets": [["@babel/preset-env", { "targets": { "node": "current" } }]]
-}
-```
-
-### Writing a Jest Test
-
-Mock `aem.js` utilities and any browser globals the block relies on, then call `decorate(block)` directly:
-
-```js
-// blocks/my-block/my-block.test.js
-import decorate from './my-block.js';
-
-// mock aem.js so tests don't need the full library
-jest.mock('../../scripts/aem.js', () => ({
-  createOptimizedPicture: (src, alt) => {
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = alt;
-    return img;
-  },
-}));
-
-function buildBlock(rows) {
-  const block = document.createElement('div');
-  rows.forEach((cells) => {
-    const row = document.createElement('div');
-    cells.forEach((html) => {
-      const cell = document.createElement('div');
-      cell.innerHTML = html;
-      row.append(cell);
-    });
-    block.append(row);
-  });
-  return block;
-}
-
-describe('my-block', () => {
-  test('renders one item per authored row', () => {
-    const block = buildBlock([
-      ['<picture><img src="a.jpg" alt="A"></picture>', '<h3>Title A</h3><p>Body</p>'],
-      ['<picture><img src="b.jpg" alt="B"></picture>', '<h3>Title B</h3><p>Body</p>'],
-    ]);
-
-    decorate(block);
-
-    expect(block.querySelectorAll('.my-block-item')).toHaveLength(2);
-  });
-
-  test('renders no items when block is empty', () => {
-    const block = buildBlock([]);
-    decorate(block);
-    expect(block.querySelectorAll('.my-block-item')).toHaveLength(0);
-  });
-
-  test('handles missing optional cell gracefully', () => {
-    const block = buildBlock([['<picture><img src="a.jpg" alt="A"></picture>']]);
-    expect(() => decorate(block)).not.toThrow();
-  });
-});
-```
-
-### Setup — Playwright
-
-Install Playwright:
-
-```sh
-npm install --save-dev @playwright/test
+npm install
 npx playwright install
 ```
 
-Add to `package.json`:
+Run all specs:
 
-```json
-{
-  "scripts": {
-    "test": "playwright test",
-    "test:watch": "playwright test --ui"
-  }
-}
-```
-
-Add `playwright.config.js` at the project root:
-
-```js
-import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  testMatch: 'blocks/**/*.spec.js',
-  use: {
-    baseURL: 'http://localhost:3000',
-  },
-  webServer: {
-    command: 'npx -y @adobe/aem-cli up --no-open --forward-browser-logs',
-    url: 'http://localhost:3000',
-    reuseExistingServer: true,
-  },
-});
+```sh
+npm run test:e2e          # headless
+npm run test:e2e:ui       # interactive Playwright UI
 ```
 
 ### Writing a Playwright Test
 
-Playwright tests navigate to a real page (or a draft HTML file) and assert on the rendered output:
+Create a draft HTML page in `tests/` that contains the block in its authored form, then assert on the rendered output:
 
 ```js
 // blocks/my-block/my-block.spec.js
@@ -618,26 +498,30 @@ import { test, expect } from '@playwright/test';
 
 test.describe('my-block', () => {
   test('renders all items', async ({ page }) => {
-    // point at a draft page or a real preview page that contains the block
-    await page.goto('/drafts/my-block-test.html');
+    await page.goto('/tests/my-block-test.html');
 
     const items = page.locator('.my-block-item');
     await expect(items).toHaveCount(2);
   });
 
   test('image is present in each item', async ({ page }) => {
-    await page.goto('/drafts/my-block-test.html');
+    await page.goto('/tests/my-block-test.html');
     const images = page.locator('.my-block-item .my-block-image img');
     await expect(images.first()).toBeVisible();
   });
 });
 ```
 
-For Playwright tests, create a corresponding draft HTML file in `drafts/` that contains the block in its authored form.
+**Draft page structure** — place the full-page HTML file at `tests/my-block-test.html`. Shared fragment fixtures (nav, footer, fragment content) belong in `tests/fragments/` as `.plain.html` files. Override the nav and footer paths in each draft page's `<head>` so tests never depend on a live CMS:
+
+```html
+<meta name="nav"    content="/tests/fragments/nav">
+<meta name="footer" content="/tests/fragments/footer">
+```
 
 ### What to Test
 
-Regardless of framework, every block test must cover:
+Every spec must cover:
 
 1. **Happy path** — standard authored content renders the expected DOM structure.
 2. **Empty block** — block with no rows does not throw and renders valid (possibly empty) HTML.
