@@ -140,6 +140,10 @@ Use `curl` and `console.log` to inspect the HTML delivered by the backend and th
 
 Each block should be self-contained and re-useable, with CSS and JS files following the naming convention: `blockname.css`, `blockname.js`. Blocks should be responsive and accessible by default.
 
+**Demo blocks** — blocks that exist purely to showcase design system elements on documentation pages are prefixed with `_` (e.g. `_type-specimen`, `_grid-demo`, `_form-demo`). They follow the same file and decoration conventions as regular blocks but must never be used on production content pages.
+
+**Globally handled elements** — `button`, `form`, and `grid` are not implemented as blocks. Styles live in `styles/config/globals.css`, `styles/config/forms.css`, and `styles/config/grid.css` respectively.
+
 ### Auto-Blocking
 
 Auto-blocking is the process of creating blocks that aren't explicitly authored into the page based on patterns in the content. See the `buildAutoBlocks` function in `scripts.js`.

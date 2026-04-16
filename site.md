@@ -23,45 +23,26 @@ A documentation and showcase website built on Edge Delivery Services (EDS / AEM)
 ## Dark / Light Mode Strategy
 
 - **Auto mode**: Respect `prefers-color-scheme` media query by default.
-- **Manual toggle**: A theme-toggle block injects a `<button>` in the header that writes `data-theme="dark"` or `data-theme="light"` to `<html>` and persists the choice to `localStorage`.
-- **CSS implementation**: All colour tokens are defined in `:root` (light) and overridden in `[data-theme="dark"]` (plus `@media (prefers-color-scheme: dark)` for users who have not toggled manually). Tokens to add:
-
-```css
-/* Light (default) */
---background-color: #ffffff;
---surface-color: #f8f8f8;
---text-color: #131313;
---muted-color: #505050;
---border-color: #e0e0e0;
---link-color: #3b63fb;
---link-hover-color: #1d3ecf;
---accent-color: #3b63fb;
---accent-hover-color: #1d3ecf;
-
-/* Dark overrides — added in globals phase */
---background-color: #121212;
---surface-color: #1e1e1e;
---text-color: #f0f0f0;
---muted-color: #aaaaaa;
---border-color: #333333;
---link-color: #7b9fff;
---link-hover-color: #a0b8ff;
---accent-color: #7b9fff;
---accent-hover-color: #a0b8ff;
-```
-
+- **Manual toggle**: A theme-toggle block injects a `<button>` in the header that writes `data-eds-theme="dark"` or `data-eds-theme="light"` to `<html>` and persists the choice to `localStorage`.
+- **CSS implementation**: All colour tokens are already defined in `styles/config/themes.css` (light) and overridden in `[data-eds-theme="dark"]` plus `@media (prefers-color-scheme: dark)`. Project-level colour adjustments go in `styles/config/overrides.css` — see `docs/globals.md` for the full token reference.
 - The toggle block is added to the header fragment via auto-blocking so it is available on every page.
 
 ---
 
 ## Blocks to Develop
 
+> **Naming convention**: Blocks prefixed with `_` (e.g. `_type-specimen`) are documentation-only demo blocks. They exist solely to showcase design system elements on doc pages and are never used on production content pages.
+>
+> **Globally handled**: `button`, `form`, and `grid` are **not** implemented as blocks. Button styles live in `styles/config/globals.css`, form element styles in `styles/config/forms.css`, and the grid system in `styles/config/grid.css`. Demo pages for these use native HTML elements and global CSS classes directly — no block decoration required.
+
+---
+
 ### 1. `theme-toggle`
 **Purpose**: Dark / light mode toggle button rendered in the header.  
 **Authored content**: None — zero-configuration block. Authors add an empty `Theme Toggle` block to the header fragment and the block wires up the rest.  
 **Behaviour**:
 - Reads current theme from `localStorage` or `prefers-color-scheme` on load.
-- Sets `data-theme` on `<html>`.
+- Sets `data-eds-theme` on `<html>`.
 - Provides a `<button aria-pressed>` with sun/moon SVG icons.
 - Listens to `change` events on the OS media query to sync when user changes OS preference and no manual override exists.  
 **Files**: `theme-toggle.js`, `theme-toggle.css`, `block.md`, `markup.js`, `theme-toggle.spec.js`
@@ -91,19 +72,7 @@ A documentation and showcase website built on Edge Delivery Services (EDS / AEM)
 
 ---
 
-### 4. `button`
-**Purpose**: Showcase and provide all button variants used across the design system.  
-**Authored content**: Each row is one button — Row 1: label, Row 2: variant (primary | secondary | outline | ghost | danger), Row 3 (optional): size (sm | md | lg), Row 4 (optional): href for link-style buttons.  
-**Behaviour**:
-- Renders `<button>` or `<a class="button">` depending on whether an href is provided.
-- Applies variant and size modifier classes: `.button--primary`, `.button--sm`, etc.
-- Shows all variants in a grid on the `/button` demo page.
-- Disabled state supported via `disabled` attribute / `.is-disabled` class.  
-**Files**: `button.js`, `button.css`, `block.md`, `markup.js`, `button.spec.js`
-
----
-
-### 5. `card`
+### 4. `card`
 **Purpose**: Content card with image, heading, body text, and optional CTA link.  
 **Authored content**: Each row is one card — Row 1: image, Row 2: heading, Row 3: body text, Row 4 (optional): CTA link.  
 **Behaviour**:
@@ -115,32 +84,7 @@ A documentation and showcase website built on Edge Delivery Services (EDS / AEM)
 
 ---
 
-### 6. `grid-demo`
-**Purpose**: Interactive visualiser showing the 12-column layout system and responsive breakpoints.  
-**Authored content**:
-- Row 1: column spans to demonstrate (e.g. "4 4 4" renders three 4-col spans)
-- Row 2 (optional): label per span  
-**Behaviour**:
-- Renders labelled column cells inside a 12-column CSS grid container.
-- A breakpoint bar shows the current active breakpoint (default / sm / md / lg / xl / xxl).
-- Highlighted cells display their span count.  
-**Files**: `grid-demo.js`, `grid-demo.css`, `block.md`, `markup.js`, `grid-demo.spec.js`
-
----
-
-### 7. `form-demo`
-**Purpose**: Showcase all form element types and validation states.  
-**Authored content**: Each row is one form field — Row 1: input type (text | email | password | select | textarea | checkbox | radio), Row 2: label, Row 3 (optional): help text.  
-**Behaviour**:
-- Renders fully functional, accessible form controls.
-- Each control shown in all states (default / focus / error / disabled) in a grid.
-- Uses `fieldset` + `legend` grouping for radio/checkbox groups.
-- Validation states driven by CSS classes: `.is-valid`, `.is-invalid`.  
-**Files**: `form-demo.js`, `form-demo.css`, `block.md`, `markup.js`, `form-demo.spec.js`
-
----
-
-### 8. `offcanvas`
+### 5. `offcanvas`
 **Purpose**: Slide-in panel from any edge (left, right, top, bottom) for navigation, filters, or supplemental content.  
 **Authored content**: Row 1: trigger label, Row 2: panel position (left | right | top | bottom), Row 3: panel content (rich text only).  
 **Behaviour**:
@@ -153,7 +97,7 @@ A documentation and showcase website built on Edge Delivery Services (EDS / AEM)
 
 ---
 
-### 9. `modal`
+### 6. `modal`
 **Purpose**: Overlay dialog for confirmations, forms, image lightboxes, or detailed content.  
 **Authored content**: Row 1: trigger label, Row 2: modal title, Row 3: modal body content (rich text), Row 4 (optional): footer actions (links/buttons).  
 **Behaviour**:
@@ -166,19 +110,7 @@ A documentation and showcase website built on Edge Delivery Services (EDS / AEM)
 
 ---
 
-### 10. `alerts`
-**Purpose**: Dismissible inline feedback messages for success, info, warning, and danger states.  
-**Authored content**: Row 1: variant (success | info | warning | danger), Row 2: message content (rich text), Row 3 (optional): "dismissible" flag.  
-**Behaviour**:
-- Applies `.alert--{variant}` class for colour and icon.
-- SVG icon injected from `/icons/{variant}.svg`.
-- Dismiss button removes the alert from the DOM with a fade-out transition when `dismissible` is set.
-- `role="alert"` on danger/warning; `role="status"` on success/info for appropriate live-region behaviour.  
-**Files**: `alerts.js`, `alerts.css`, `block.md`, `markup.js`, `alerts.spec.js`
-
----
-
-### 11. `breadcrumbs`
+### 7. `breadcrumbs`
 **Purpose**: Hierarchical page location trail for navigation context.  
 **Authored content**: Each row is one crumb — Row 1: label, Row 2: href (omit for current page).  
 **Behaviour**:
@@ -190,7 +122,7 @@ A documentation and showcase website built on Edge Delivery Services (EDS / AEM)
 
 ---
 
-### 12. `toc` (Table of Contents)
+### 8. `toc` (Table of Contents)
 **Purpose**: Auto-generated in-page navigation for long documentation pages.  
 **Authored content**: Zero-configuration block placed at the top of a documentation page.  
 **Behaviour**:
@@ -202,37 +134,66 @@ A documentation and showcase website built on Edge Delivery Services (EDS / AEM)
 
 ---
 
-### 13. `callout`
+### 9. `callouts`
 **Purpose**: Highlighted info, warning, tip, and danger notices inline with content.  
 **Authored content**: Row 1: variant (info | warning | tip | danger), Row 2: message content (rich text).  
 **Behaviour**:
-- Applies `.callout--{variant}` class to drive icon and colour.
+- Applies `.callouts--{variant}` class to drive icon and colour.
 - SVG icon injected from `/icons/{variant}.svg`.
 - `role="note"` or `role="alert"` depending on variant severity.  
-**Files**: `callout.js`, `callout.css`, `block.md`, `markup.js`, `callout.spec.js`
+**Files**: `callouts.js`, `callouts.css`, `block.md`, `markup.js`, `callouts.spec.js`
 
 ---
 
-### 14. `type-specimen`
+### 10. `_type-specimen` *(demo)*
 **Purpose**: Full typography specimen showing every heading level, body size, weight, and style in the current theme.  
 **Authored content**: Zero-configuration block; authors drop an empty `Type Specimen` block on the typography page.  
 **Behaviour**:
 - Programmatically generates `h1`–`h6`, paragraph, lead, small, monospace, and blockquote examples.
 - Each entry shows the CSS variable name used.
 - Mirrors live values from `getComputedStyle` so the page always reflects the current token values.  
-**Files**: `type-specimen.js`, `type-specimen.css`, `block.md`, `markup.js`, `type-specimen.spec.js`
+**Files**: `_type-specimen.js`, `_type-specimen.css`, `block.md`, `markup.js`, `_type-specimen.spec.js`
+
+---
+
+### 11. `_grid-demo` *(demo)*
+**Purpose**: Interactive visualiser showing the 12-column layout system and responsive breakpoints.  
+**Authored content**:
+- Row 1: column spans to demonstrate (e.g. "4 4 4" renders three 4-col spans)
+- Row 2 (optional): label per span  
+**Behaviour**:
+- Renders labelled column cells inside a 12-column CSS grid container using the global grid classes from `styles/config/grid.css`.
+- A breakpoint bar shows the current active breakpoint (default / sm / md / lg / xl / xxl).
+- Highlighted cells display their span count.  
+**Files**: `_grid-demo.js`, `_grid-demo.css`, `block.md`, `markup.js`, `_grid-demo.spec.js`
+
+---
+
+### 12. `_form-demo` *(demo)*
+**Purpose**: Showcase all form element types and validation states using the global form styles from `styles/config/forms.css`.  
+**Authored content**: Each row is one form field — Row 1: input type (text | email | password | select | textarea | checkbox | radio), Row 2: label, Row 3 (optional): help text.  
+**Behaviour**:
+- Renders fully functional, accessible form controls styled entirely by global CSS — no block-scoped form styles.
+- Each control shown in all states (default / focus / error / disabled) in a grid.
+- Uses `fieldset` + `legend` grouping for radio/checkbox groups.
+- Validation states driven by CSS classes: `.is-valid`, `.is-invalid`.  
+**Files**: `_form-demo.js`, `_form-demo.css`, `block.md`, `markup.js`, `_form-demo.spec.js`
 
 ---
 
 ## Global Style Additions
 
-### styles/styles.css
-- Add dark-mode colour token overrides under `[data-theme="dark"]` and `@media (prefers-color-scheme: dark)`.
-- Add 12-column grid utilities as CSS custom properties (`--grid-columns: 12`, `--grid-gap: 1.5rem`).
-- Define semantic colour tokens: `--color-success`, `--color-warning`, `--color-danger`, `--color-info`.
-- Define border-radius tokens: `--border-radius-s`, `--border-radius-m`, `--border-radius-l`.
-- Define shadow tokens: `--shadow-s`, `--shadow-m`, `--shadow-l`.
-- Define transition token: `--transition-speed: 200ms`.
+### styles/config/overrides.css
+- The single file new developers should edit to customise design tokens (colours, fonts, spacing, etc.) for this project. All overrides placed here win the cascade without `!important`. See `docs/globals.md` for the full token reference and usage guidance.
+
+### styles/config/globals.css
+- **Button styles**: All `.button` variant and size modifier classes (`.button--primary`, `.button--secondary`, `.button--outline`, `.button--ghost`, `.button--danger`, `.button--sm`, `.button--lg`). No separate `button` block exists — styling is purely global CSS.
+
+### styles/config/forms.css
+- **Form element styles**: All input, select, textarea, checkbox, radio, and validation state styles (`.is-valid`, `.is-invalid`). No separate `form` block exists — all form elements on any page are styled globally.
+
+### styles/config/grid.css
+- **Grid system**: The 12-column layout via `.container`, `.row`, `.col-{n}`, and CSS Grid helper classes. No separate `grid` block exists — grid layout is authored directly with these utility classes.
 
 ### styles/lazy-styles.css
 - Helper / utility classes (loaded post-LCP, safe for layout):
@@ -265,22 +226,20 @@ Once the colour palette is confirmed:
 
 ## Development Order
 
-1. **Global styles** — Dark/light tokens, grid utilities, helper classes in `styles/styles.css` and `lazy-styles.css`.
+1. **Global styles** — Verify tokens in `styles/config/`, confirm `styles/config/overrides.css` is wired. Add any missing button/form/grid utility classes to `globals.css`, `forms.css`, and `grid.css`. Add helper classes to `lazy-styles.css`.
 2. **`theme-toggle`** — Needed early so every subsequent page can be tested in both themes.
 3. **`toc`** — Needed to navigate long doc pages during development.
 4. **`breadcrumbs`** — Shared navigation chrome; needed on all doc pages.
-5. **`callout`** — Used heavily across all doc pages for notes and warnings.
-6. **`alerts`** — Close sibling to callout; share token and icon patterns.
-7. **`tabs`** — Used for variant switching on block demo pages.
-8. **`accordion`** — Docs and FAQ sections.
-9. **`button`** — Referenced by card and form-demo; needed first.
-10. **`card`** — Grid and blocks pages.
-11. **`modal`** — Standalone interactive block.
-12. **`offcanvas`** — Standalone interactive block.
-13. **`type-specimen`** — Typography page.
-14. **`grid-demo`** — Grid page.
-15. **`form-demo`** — Forms page.
-16. **Content pages** — Author all seven doc pages (home, typography, grid, blocks, helpers, utilities, forms).
+5. **`callouts`** — Used heavily across all doc pages for notes and warnings.
+6. **`tabs`** — Used for variant switching on block demo pages.
+7. **`accordion`** — Docs and FAQ sections.
+8. **`card`** — Grid and blocks pages.
+9. **`modal`** — Standalone interactive block.
+10. **`offcanvas`** — Standalone interactive block.
+11. **`_type-specimen`** — Typography page.
+12. **`_grid-demo`** — Grid page.
+13. **`_form-demo`** — Forms page.
+14. **Content pages** — Author all seven doc pages (home, typography, grid, blocks, helpers, utilities, forms).
 
 ---
 
@@ -454,7 +413,7 @@ inset-inline-start: 0;
 Apply to all headings and callout text to eliminate orphaned words:
 
 ```css
-h1, h2, h3, .callout { text-wrap: balance; }
+h1, h2, h3, .callouts { text-wrap: balance; }
 p, li       { text-wrap: pretty; }
 ```
 
