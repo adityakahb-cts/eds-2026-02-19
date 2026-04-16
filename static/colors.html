@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colors — EDS Design System</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <style>
+    .demo-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-sticky);
+    }
+    .demo-nav .container { display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap; }
+    .demo-nav strong { font-size: 1rem; margin-right: auto; }
+    .demo-nav a { font-size: 0.875rem; color: var(--color-link); text-decoration: none; }
+    .demo-nav a:hover { text-decoration: underline; }
+
+    .page-title { margin-top: var(--spacing-7); margin-bottom: var(--spacing-2); }
+    .page-sub { color: var(--color-text-secondary); margin-bottom: var(--spacing-7); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--spacing-2);
+    }
+
+    /* Raw palette swatches */
+    .palette-group { margin-bottom: var(--spacing-7); }
+    .palette-group h3 { font-size: 1rem; margin-bottom: var(--spacing-3); }
+    .palette-row { display: flex; border-radius: var(--border-radius-m); overflow: hidden; }
+    .swatch {
+      flex: 1;
+      height: 64px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      padding-bottom: 6px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: transparent;
+      transition: flex var(--transition);
+    }
+    .palette-row:hover .swatch { flex: 1; }
+    .swatch span { background: rgba(255,255,255,0.6); color: #000; padding: 1px 4px; border-radius: 2px; }
+
+    /* Semantic token cards */
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: var(--spacing-4);
+    }
+    .token-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-m);
+      overflow: hidden;
+    }
+    .token-swatch { height: 56px; }
+    .token-info { padding: var(--spacing-3); }
+    .token-info strong { display: block; font-size: 0.8rem; }
+    .token-info code { font-size: 0.7rem; color: var(--color-text-secondary); word-break: break-all; }
+
+    /* Semantic state cards */
+    .state-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: var(--spacing-5);
+    }
+    .state-card {
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-m);
+      overflow: hidden;
+    }
+    .state-header {
+      padding: var(--spacing-3) var(--spacing-4);
+      font-weight: 700;
+      font-size: 0.875rem;
+    }
+    .state-swatches { display: flex; }
+    .state-swatch {
+      flex: 1;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: rgba(0,0,0,0.6);
+    }
+    .state-swatch.light { color: rgba(255,255,255,0.8); }
+
+    /* Theme toggle */
+    .theme-toggle-bar {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-3);
+      margin-bottom: var(--spacing-5);
+    }
+    .theme-toggle-bar button {
+      padding: var(--spacing-2) var(--spacing-4);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-pill);
+      cursor: pointer;
+      font-size: 0.875rem;
+      background: var(--color-surface);
+      color: var(--color-text);
+    }
+    .theme-toggle-bar button.active {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      border-color: var(--color-primary);
+    }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <div class="container">
+      <strong><a href="index.html" style="color:inherit;text-decoration:none;">EDS Design System</a></strong>
+      <a href="colors.html">Colors</a>
+      <a href="typography.html">Typography</a>
+      <a href="buttons.html">Buttons</a>
+      <a href="forms.html">Forms</a>
+      <a href="grid.html">Grid</a>
+      <a href="utilities.html">Utilities</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Colors</h1>
+      <p class="page-sub">Raw palette tokens from <code>colors.css</code> and semantic tokens from <code>themes.css</code>. Use the theme toggle to preview light vs dark mode.</p>
+
+      <div class="theme-toggle-bar">
+        <span>Theme:</span>
+        <button id="btn-light" class="active" onclick="setTheme('light')">Light</button>
+        <button id="btn-dark" onclick="setTheme('dark')">Dark</button>
+        <button id="btn-auto" onclick="setTheme('auto')">System</button>
+      </div>
+
+      <!-- RAW PALETTE -->
+      <p class="section-label">Raw Palette — colors.css</p>
+
+      <div class="palette-group">
+        <h3>Neutral</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-neutral-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-neutral-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-neutral-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-neutral-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-neutral-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-neutral-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-neutral-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-neutral-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-neutral-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-neutral-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-neutral-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <h3>Blue</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-blue-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-blue-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-blue-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-blue-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-blue-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-blue-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-blue-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-blue-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-blue-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-blue-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-blue-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <h3>Violet</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-violet-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-violet-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-violet-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-violet-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-violet-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-violet-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-violet-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-violet-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-violet-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-violet-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-violet-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <h3>Teal</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-teal-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-teal-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-teal-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-teal-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-teal-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-teal-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-teal-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-teal-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-teal-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-teal-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-teal-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <h3>Red</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-red-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-red-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-red-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-red-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-red-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-red-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-red-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-red-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-red-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-red-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-red-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <h3>Green</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-green-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-green-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-green-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-green-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-green-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-green-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-green-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-green-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-green-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-green-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-green-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <h3>Sky</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-sky-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-sky-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-sky-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-sky-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-sky-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-sky-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-sky-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-sky-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-sky-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-sky-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-sky-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <div class="palette-group">
+        <h3>Amber</h3>
+        <div class="palette-row">
+          <div class="swatch" style="background:var(--color-amber-0)"><span>0</span></div>
+          <div class="swatch" style="background:var(--color-amber-50)"><span>50</span></div>
+          <div class="swatch" style="background:var(--color-amber-100)"><span>100</span></div>
+          <div class="swatch" style="background:var(--color-amber-200)"><span>200</span></div>
+          <div class="swatch" style="background:var(--color-amber-300)"><span>300</span></div>
+          <div class="swatch" style="background:var(--color-amber-400)"><span>400</span></div>
+          <div class="swatch" style="background:var(--color-amber-500)"><span>500</span></div>
+          <div class="swatch" style="background:var(--color-amber-600)"><span>600</span></div>
+          <div class="swatch" style="background:var(--color-amber-700)"><span>700</span></div>
+          <div class="swatch" style="background:var(--color-amber-800)"><span>800</span></div>
+          <div class="swatch" style="background:var(--color-amber-900)"><span>900</span></div>
+        </div>
+      </div>
+
+      <!-- SEMANTIC STATES -->
+      <p class="section-label">Semantic State Tokens — themes.css</p>
+      <div class="state-grid">
+
+        <div class="state-card">
+          <div class="state-header" style="background:var(--color-primary);color:var(--color-primary-text);">Primary</div>
+          <div class="state-swatches">
+            <div class="state-swatch light" style="background:var(--color-primary);">base</div>
+            <div class="state-swatch light" style="background:var(--color-primary-hover);">hover</div>
+            <div class="state-swatch light" style="background:var(--color-primary-active);">active</div>
+            <div class="state-swatch" style="background:var(--color-primary-subtle);">subtle</div>
+            <div class="state-swatch" style="background:var(--color-primary-border);">border</div>
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-header" style="background:var(--color-secondary);color:var(--color-secondary-text);">Secondary</div>
+          <div class="state-swatches">
+            <div class="state-swatch light" style="background:var(--color-secondary);">base</div>
+            <div class="state-swatch light" style="background:var(--color-secondary-hover);">hover</div>
+            <div class="state-swatch light" style="background:var(--color-secondary-active);">active</div>
+            <div class="state-swatch" style="background:var(--color-secondary-subtle);">subtle</div>
+            <div class="state-swatch" style="background:var(--color-secondary-border);">border</div>
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-header" style="background:var(--color-tertiary);color:var(--color-tertiary-text);">Tertiary</div>
+          <div class="state-swatches">
+            <div class="state-swatch light" style="background:var(--color-tertiary);">base</div>
+            <div class="state-swatch light" style="background:var(--color-tertiary-hover);">hover</div>
+            <div class="state-swatch light" style="background:var(--color-tertiary-active);">active</div>
+            <div class="state-swatch" style="background:var(--color-tertiary-subtle);">subtle</div>
+            <div class="state-swatch" style="background:var(--color-tertiary-border);">border</div>
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-header" style="background:var(--color-danger);color:var(--color-danger-text);">Danger</div>
+          <div class="state-swatches">
+            <div class="state-swatch light" style="background:var(--color-danger);">base</div>
+            <div class="state-swatch light" style="background:var(--color-danger-hover);">hover</div>
+            <div class="state-swatch light" style="background:var(--color-danger-active);">active</div>
+            <div class="state-swatch" style="background:var(--color-danger-subtle);">subtle</div>
+            <div class="state-swatch" style="background:var(--color-danger-border);">border</div>
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-header" style="background:var(--color-success);color:var(--color-success-text);">Success</div>
+          <div class="state-swatches">
+            <div class="state-swatch light" style="background:var(--color-success);">base</div>
+            <div class="state-swatch light" style="background:var(--color-success-hover);">hover</div>
+            <div class="state-swatch light" style="background:var(--color-success-active);">active</div>
+            <div class="state-swatch" style="background:var(--color-success-subtle);">subtle</div>
+            <div class="state-swatch" style="background:var(--color-success-border);">border</div>
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-header" style="background:var(--color-info);color:var(--color-info-text);">Info</div>
+          <div class="state-swatches">
+            <div class="state-swatch light" style="background:var(--color-info);">base</div>
+            <div class="state-swatch light" style="background:var(--color-info-hover);">hover</div>
+            <div class="state-swatch light" style="background:var(--color-info-active);">active</div>
+            <div class="state-swatch" style="background:var(--color-info-subtle);">subtle</div>
+            <div class="state-swatch" style="background:var(--color-info-border);">border</div>
+          </div>
+        </div>
+
+        <div class="state-card">
+          <div class="state-header" style="background:var(--color-warning);color:var(--color-warning-text);">Warning</div>
+          <div class="state-swatches">
+            <div class="state-swatch" style="background:var(--color-warning);">base</div>
+            <div class="state-swatch" style="background:var(--color-warning-hover);">hover</div>
+            <div class="state-swatch" style="background:var(--color-warning-active);">active</div>
+            <div class="state-swatch" style="background:var(--color-warning-subtle);">subtle</div>
+            <div class="state-swatch" style="background:var(--color-warning-border);">border</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SURFACE TOKENS -->
+      <p class="section-label">Surface &amp; Text Tokens</p>
+      <div class="token-grid">
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-surface);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Surface</strong><code>--color-surface</code></div>
+        </div>
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-surface-raised);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Surface Raised</strong><code>--color-surface-raised</code></div>
+        </div>
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-surface-overlay);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Surface Overlay</strong><code>--color-surface-overlay</code></div>
+        </div>
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-text);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Text</strong><code>--color-text</code></div>
+        </div>
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-text-secondary);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Text Secondary</strong><code>--color-text-secondary</code></div>
+        </div>
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-text-disabled);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Text Disabled</strong><code>--color-text-disabled</code></div>
+        </div>
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-border);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Border</strong><code>--color-border</code></div>
+        </div>
+        <div class="token-card">
+          <div class="token-swatch" style="background:var(--color-link);border-bottom:1px solid var(--color-border);"></div>
+          <div class="token-info"><strong>Link</strong><code>--color-link</code></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: var(--spacing-8);"></div>
+    </div>
+  </main>
+
+  <script>
+    function setTheme(mode) {
+      const html = document.documentElement;
+      if (mode === 'auto') {
+        html.removeAttribute('data-eds-theme');
+      } else {
+        html.setAttribute('data-eds-theme', mode);
+      }
+      document.querySelectorAll('.theme-toggle-bar button').forEach((b) => b.classList.remove('active'));
+      document.getElementById(`btn-${mode}`).classList.add('active');
+    }
+  </script>
+</body>
+</html>

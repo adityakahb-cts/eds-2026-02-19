@@ -160,6 +160,7 @@ CSS custom properties cannot appear inside `@media` conditions. Always write the
 | `styles/config/forms.css` | `base` | Input, textarea, select, checkbox, radio, validation states |
 | `styles/config/globals.css` | `base` | `body`, header/footer chrome, images, icons, `.button`, sections |
 | `styles/config/utilities.css` | `utilities` | Display, flexbox, gap, spacing, text, position, z-index, border, animation |
+| `styles/config/buttons.css` | `utilities` | `.btn` component system + semantic border-colour, per-side radius, and focus-ring utilities |
 | `styles/config/overrides.css` | `overrides` | **Project-level token overrides** — the correct place to customise any `:root` design token for the project |
 
 ### CSS Custom Properties
@@ -322,10 +323,13 @@ These exist in `styles/styles.css` `:root` for backwards compatibility with exis
 
 #### Typography — Families
 
-| Property | Value |
-|---|---|
-| `--body-font-family` | `roboto, roboto-fallback, sans-serif` |
-| `--heading-font-family` | `roboto-condensed, roboto-condensed-fallback, sans-serif` |
+| Property | Value | Weights available |
+|---|---|---|
+| `--body-font-family` | `noto-sans, noto-sans-fallback, sans-serif` | 300, 400, 500, 700 (+ italic) |
+| `--heading-font-family` | `noto-serif, noto-serif-fallback, serif` | 300, 400, 500, 700 (+ italic) |
+| `--mono-font-family` | `google-sans-code, google-sans-code-fallback, ui-monospace, monospace` | 300, 400, 500, 700 (+ italic) |
+
+Font files live in `fonts/{noto-sans,noto-serif,google-code}/`. Fallback `@font-face` declarations (with `size-adjust` to minimise CLS) are defined at the bottom of `styles/styles.css` and use `local('Arial')`, `local('Georgia')`, and `local('Courier New')` respectively. The full `@font-face` rules (with `font-display: swap`) live in `styles/fonts.css`, loaded by `loadFonts()` in `scripts/scripts.js`.
 
 #### Typography — Fluid Type Scale
 
@@ -497,7 +501,7 @@ Loaded by `loadFonts()` — at most once per session after the session flag is s
 }
 ```
 
-4. Register the font family in `styles/styles.css`:
+4. Override the relevant token in `styles/config/overrides.css` (the `overrides` layer wins without `!important`):
 
 ```css
 :root {

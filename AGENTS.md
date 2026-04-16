@@ -50,6 +50,7 @@ The repository provides the basic structure, blocks, and configuration needed to
         ├── globals.css     # Body, header/footer chrome, images, buttons, sections
         ├── normalize.css   # CSS reset, box-sizing, interpolate-size
         ├── utilities.css   # Display, flex, spacing, text, z-index, animation helpers
+        ├── buttons.css     # .btn component system, border-colour utilities, per-side radius, focus rings
         └── overrides.css   # Project-level token overrides — new developers edit only this file
 ├── scripts/         # JavaScript libraries and utilities
     ├── aem.js           # Core AEM Library for Edge Delivery page decoration logic (NEVER MODIFY THIS FILE)

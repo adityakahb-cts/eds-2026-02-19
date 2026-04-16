@@ -22,6 +22,7 @@
 @import url('config/forms.css') layer(base);
 @import url('config/globals.css') layer(base);
 @import url('config/utilities.css') layer(utilities);
+@import url('config/buttons.css') layer(utilities);
 @import url('config/overrides.css') layer(overrides);
 
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
@@ -54,8 +55,9 @@
   --accent-hover-color: var(--color-primary-hover);
 
   /* ── Fonts ── */
-  --body-font-family: roboto, roboto-fallback, sans-serif;
-  --heading-font-family: roboto-condensed, roboto-condensed-fallback, sans-serif;
+  --body-font-family: noto-sans, noto-sans-fallback, sans-serif;
+  --heading-font-family: noto-serif, noto-serif-fallback, serif;
+  --mono-font-family: google-sans-code, google-sans-code-fallback, ui-monospace, monospace;
 
   /* ── Fluid type scale ──────────────────────────────────────────────────────
    * clamp(min-size, preferred, max-size)
@@ -147,14 +149,26 @@
 }
 
 /* ─── Fallback fonts (kept here — needed before first paint) ─────────────── */
+
+/*
+ * size-adjust compensates for metric differences between the fallback and the
+ * web font so text reflow (CLS) is minimised when the custom font swaps in.
+ * Tune these values by comparing layouts with/without the web font loaded.
+ */
 @font-face {
-  font-family: roboto-condensed-fallback;
-  size-adjust: 88.82%;
+  font-family: noto-sans-fallback;
+  size-adjust: 99.3%;
   src: local('Arial');
 }
 
 @font-face {
-  font-family: roboto-fallback;
-  size-adjust: 99.529%;
-  src: local('Arial');
+  font-family: noto-serif-fallback;
+  size-adjust: 100%;
+  src: local('Georgia');
+}
+
+@font-face {
+  font-family: google-sans-code-fallback;
+  size-adjust: 100%;
+  src: local('Courier New');
 }

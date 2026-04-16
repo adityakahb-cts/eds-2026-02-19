@@ -92,7 +92,7 @@ main ul { list-style-type: disc; }
 /* ── Code ── */
 code {
   font-size: var(--font-size-small);
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+  font-family: var(--mono-font-family);
   line-height: 1.6; /* WCAG 1.4.12 — monospace at small sizes needs extra leading */
   padding: 0.1em 0.35em;
   border-radius: var(--border-radius-s);
