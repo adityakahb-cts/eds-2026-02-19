@@ -643,6 +643,271 @@ All features target **Baseline 2025** or earlier. Nothing in this list requires 
 
 ---
 
+## Fragment Loading Strategy
+
+### Problem
+
+Every call to `loadFragment(path)` today issues a fresh `fetch`, runs the full `decorateMain` + `loadSections` pipeline, and resolves independently. With header, footer, and any inline `/fragments/*` links all loading concurrently during the lazy phase, the client accumulates:
+
+- **Duplicate network requests** — the same path can be fetched more than once if referenced in multiple places on the same page.
+- **Uncoordinated promises** — `scripts.js` auto-blocking uses `forEach(async …)`, which fires promises in parallel but does not await them together; errors are silently swallowed and no back-pressure is applied.
+- **Serial header + footer waterfalls** — `header.js` and `footer.js` each independently `await loadFragment()`. They are called during `loadLazy` but nothing pre-warms their fetches while earlier work is still running.
+- **Unbounded growth** — every new block that loads a fragment (carousel slides, tabs panels, offcanvas content, etc.) multiplies the problem linearly.
+
+### Planned Improvements
+
+#### 1. Module-level deduplication cache (`fragment.js`)
+
+Add a `Map<string, Promise<HTMLElement>>` at module scope. Before issuing a `fetch`, check whether an in-flight or completed promise already exists for that path. If so, return the cached promise directly. This collapses duplicate requests to a single network round-trip regardless of how many blocks or auto-block invocations request the same URL.
+
+```js
+/** @type {Map<string, Promise<HTMLElement|null>>} */
+const fragmentCache = new Map();
+
+export async function loadFragment(path) {
+  if (!path?.startsWith('/') || path.startsWith('//')) return null;
+  if (!fragmentCache.has(path)) {
+    fragmentCache.set(path, (async () => {
+      const resp = await fetch(`${path}.plain.html`, { signal: AbortSignal.timeout(8000) });
+      if (!resp.ok) return null;
+      const main = document.createElement('main');
+      main.innerHTML = await resp.text();
+      resetMediaBase(main, path);
+      decorateMain(main);
+      await loadSections(main);
+      return main;
+    })());
+  }
+  return fragmentCache.get(path);
+}
+```
+
+> **Note:** The cache stores the `Promise`, not the resolved element. Any second caller that arrives while the first fetch is still in-flight awaits the same promise — zero duplicate requests even under parallel load.
+
+#### 2. Pre-warm fetches during eager/lazy phase handoff (`scripts.js`)
+
+`loadLazy` knows it will shortly load the header and footer fragments. Kick off their `fetch` calls (via `loadFragment`) *before* the `loadHeader` / `loadFooter` blocks are decorated, so the network requests are already in-flight (or complete) when the blocks call `loadFragment` again. The cache means the second call costs nothing.
+
+```js
+async function loadLazy(doc) {
+  // Pre-warm known fragments so fetches are in-flight during block decoration
+  const navMeta = getMetadata('nav');
+  const footerMeta = getMetadata('footer');
+  loadFragment(navMeta ? new URL(navMeta, window.location).pathname : '/nav');
+  loadFragment(footerMeta ? new URL(footerMeta, window.location).pathname : '/footer');
+
+  // … rest of existing loadLazy logic …
+}
+```
+
+No `await` here — fire and forget into the cache. The blocks pick up the resolved value when they need it.
+
+#### 3. Replace `forEach(async)` with `Promise.allSettled` in auto-blocking (`scripts.js`)
+
+The current auto-block loop silently swallows errors and provides no back-pressure. Replace with `Promise.allSettled` so all fragment fetches are issued in parallel, errors are surfaced, and the block waits for all of them before continuing.
+
+```js
+const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')]
+  .filter((f) => !f.closest('.fragment'));
+
+if (fragments.length > 0) {
+  const { loadFragment } = await import('../blocks/fragment/fragment.js');
+  await Promise.allSettled(
+    fragments.map(async (link) => {
+      const { pathname } = new URL(link.href);
+      const frag = await loadFragment(pathname);
+      if (frag) link.parentElement.replaceWith(...frag.children);
+    }),
+  );
+}
+```
+
+#### 4. `AbortSignal.timeout` on all fragment fetches
+
+Already planned in the Modern Platform Features section. Every `fetch` inside `loadFragment` must pass `{ signal: AbortSignal.timeout(8000) }` so a slow or hanging CMS response cannot stall block decoration indefinitely.
+
+#### 5. Future: per-block fragment pre-loading hint (optional, deferred)
+
+Blocks that are known to load fragments (e.g. `tabs`, `offcanvas`, `carousel`) can call `loadFragment(path)` during their *discovery* step (before the decoration `await`) so the fetch runs while the block's other setup work completes. This is a block-author convention, not a framework change, and is deferred until multiple fragment-heavy blocks exist.
+
+### LCP and Lighthouse Impact
+
+#### Metric breakdown
+
+| Lighthouse metric | How fragment loading harms it today | Target fix |
+|---|---|---|
+| **LCP** | `buildAutoBlocks` fires fragment `fetch` calls during `loadEager` — inline-fragment requests compete with the LCP hero image for bandwidth on a single HTTP/2 connection. | Move inline-fragment loading entirely to `loadLazy`; add `<link rel="preload">` for nav only. |
+| **TBT** | `decorateMain` + `loadSections` inside each `loadFragment` call runs synchronously on the main thread. Multiple concurrent fragment decorations stack up and block long tasks. | Yield between fragment decoration tasks with `scheduler.yield()` (or `setTimeout(0)` fallback); batch inline-fragment work outside the LCP section. |
+| **CLS** | Header and footer fragments are inserted into the DOM after initial paint with no reserved space. The sudden height change of nav and footer shifts all page content. | Reserve header/footer height via CSS `min-height` on the `<header>` and `<footer>` shell elements before fragments load. Use `content-visibility: auto` on below-fold fragments. |
+| **INP** | Long decoration tasks on the main thread delay response to user interaction (click, keyboard). | Same `scheduler.yield()` fix as TBT; keep individual decoration tasks under 50 ms. |
+| **FCP / TTFB** | Not directly affected by fragment strategy, but extra fetches during eager phase add to connection contention on slower networks. | `fetchpriority: 'low'` on footer fetch; no inline-fragment fetches before LCP. |
+
+#### Fix 1 — Isolate fragment loading from the LCP critical path (`scripts.js`)
+
+`buildAutoBlocks` runs inside `decorateMain`, which is called in `loadEager`. Inline `/fragments/*` auto-blocks must not start fetching during this phase. Collect the URLs during `buildAutoBlocks` but defer the actual `loadFragment` calls to `loadLazy`:
+
+```js
+// buildAutoBlocks — discover only, no fetch
+function buildAutoBlocks(main) {
+  try {
+    // Mark inline fragment links for deferred loading; do NOT fetch here
+    main.querySelectorAll('a[href*="/fragments/"]')
+      .forEach((link) => {
+        if (!link.closest('.fragment')) link.dataset.deferFragment = link.href;
+      });
+    buildHeroBlock(main);
+  } catch (e) { /* … */ }
+}
+
+// loadLazy — load inline fragments after LCP is complete
+async function loadLazy(doc) {
+  const main = doc.querySelector('main');
+
+  // Pre-warm nav + footer fetches before block decoration starts
+  const navPath = /* getMetadata('nav') logic */ '/nav';
+  const footerPath = /* getMetadata('footer') logic */ '/footer';
+  loadFragment(navPath);   // fires into cache, no await
+  loadFragment(footerPath); // fires into cache, no await
+
+  loadHeader(doc.querySelector('header'));
+  await loadSections(main);
+
+  // Now load inline fragments — LCP is already done
+  const inlineFragments = [...main.querySelectorAll('[data-defer-fragment]')];
+  if (inlineFragments.length > 0) {
+    const { loadFragment: lf } = await import('../blocks/fragment/fragment.js');
+    await Promise.allSettled(inlineFragments.map(async (link) => {
+      const { pathname } = new URL(link.dataset.deferFragment);
+      const frag = await lf(pathname);
+      if (frag) link.parentElement.replaceWith(...frag.children);
+    }));
+  }
+
+  loadFooter(doc.querySelector('footer'));
+  loadCSS(`${window.hlx.codeBasePath}/styles/lazy-styles.css`);
+  loadFonts();
+}
+```
+
+#### Fix 2 — Browser-level preload hint for the nav fragment (`scripts.js`)
+
+Inject a `<link rel="preload" as="fetch" crossorigin>` for the nav path during `loadEager`, before any JS fetch is made. The browser's preload scanner picks this up immediately and the request starts while the LCP image is also downloading — no JS roundtrip delay.
+
+```js
+async function loadEager(doc) {
+  document.documentElement.lang = 'en';
+  decorateTemplateAndTheme();
+
+  // Inject nav preload hint as early as possible so the browser starts fetching
+  // the nav fragment.plain.html while the LCP hero image loads in parallel.
+  const navMeta = getMetadata('nav');
+  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
+  const preload = document.createElement('link');
+  preload.rel = 'preload';
+  preload.as = 'fetch';
+  preload.href = `${navPath}.plain.html`;
+  preload.crossOrigin = 'anonymous';
+  document.head.append(preload);
+
+  const main = doc.querySelector('main');
+  if (main) {
+    decorateMain(main);
+    document.body.classList.add('appear');
+    await loadSection(main.querySelector('.section'), waitForFirstImage);
+  }
+  // …
+}
+```
+
+Do **not** add a preload hint for the footer — it is below the fold and preloading it would compete with LCP resources.
+
+#### Fix 3 — `fetchpriority` on fragment requests (`fragment.js`)
+
+Pass `fetchpriority` via fetch options. Expose an optional `priority` parameter on `loadFragment`:
+
+```js
+export async function loadFragment(path, { priority = 'auto' } = {}) {
+  if (!path?.startsWith('/') || path.startsWith('//')) return null;
+  if (!fragmentCache.has(path)) {
+    fragmentCache.set(path, (async () => {
+      const resp = await fetch(`${path}.plain.html`, {
+        priority,
+        signal: AbortSignal.timeout(8000),
+      });
+      // …
+    })());
+  }
+  return fragmentCache.get(path);
+}
+```
+
+Call sites:
+- Nav: `loadFragment(navPath, { priority: 'high' })` — user sees it immediately
+- Footer: `loadFragment(footerPath, { priority: 'low' })` — below the fold
+- Inline auto-blocks: `loadFragment(path)` — default `'auto'`
+
+#### Fix 4 — Reserve header and footer height to prevent CLS (`styles/config/globals.css`)
+
+Before a fragment loads, the `<header>` and `<footer>` shell elements have zero height. When the fragment inserts content, the entire page shifts down. Reserve space with a `min-height` that matches the expected rendered height. Use a CSS custom property so the value is easy to tune per project:
+
+```css
+:root {
+  --header-min-height: 64px;   /* tune to match designed nav height */
+  --footer-min-height: 160px;  /* tune to match designed footer height */
+}
+
+header { min-height: var(--header-min-height); }
+footer { min-height: var(--footer-min-height); }
+```
+
+Pair with `content-visibility: auto` on the footer to skip rendering cost until it enters the viewport:
+
+```css
+footer { content-visibility: auto; contain-intrinsic-size: 0 var(--footer-min-height); }
+```
+
+#### Fix 5 — Yield between fragment decoration tasks to reduce TBT (`fragment.js`)
+
+Each `loadSections` call inside `loadFragment` is a long synchronous task. For pages with multiple inline fragments, chain them through a microtask yield so the browser can process input events between tasks:
+
+```js
+// After decorateMain(main) and before loadSections(main) inside loadFragment:
+await new Promise((r) => { setTimeout(r, 0); }); // yield to browser
+await loadSections(main);
+```
+
+Use `scheduler.yield()` when available (Chrome 129+) with a `setTimeout` fallback:
+
+```js
+const yieldToMain = () => ('scheduler' in globalThis && 'yield' in scheduler)
+  ? scheduler.yield()
+  : new Promise((r) => { setTimeout(r, 0); });
+```
+
+### Implementation Order
+
+1. **Fix 1 — Defer inline fragments out of eager phase** (`scripts.js`) — directly protects LCP; highest priority.
+2. **Fix 4 — Reserve header/footer height** (`globals.css`) — eliminates CLS; CSS-only, zero risk.
+3. **Cache + `AbortSignal.timeout`** (`fragment.js`) — deduplication and resilience; self-contained.
+4. **Fix 2 — Nav preload hint** (`scripts.js`) — browser-level optimisation; add alongside Fix 1.
+5. **Fix 3 — `fetchpriority`** (`fragment.js`) — fine-tuning; add when touching `fragment.js`.
+6. **Fix 5 — `scheduler.yield()`** (`fragment.js`) — TBT reduction; add last, measure before/after with Lighthouse.
+7. **`Promise.allSettled` fix** (`scripts.js`) — correctness; bundle with Fix 1.
+8. **Per-block hints** — deferred; revisit after `tabs` and `offcanvas` are built.
+
+### Measuring Progress
+
+Run Lighthouse against the feature preview URL after each implementation step:
+
+```
+https://{branch}--{repo}--{owner}.aem.page/
+```
+
+Target scores: **LCP ≤ 2.5 s**, **TBT ≤ 50 ms**, **CLS ≤ 0.05**, overall **Performance 100**.  
+Use the `performance.mark()` / `performance.measure()` API to bracket `loadFragment` calls during local development to identify which fragment contributes most to TBT.
+
+---
+
 ## Open Items
 
 - [ ] Confirm font stack (user to provide).
