@@ -3,7 +3,6 @@ import {
   loadHeader,
   loadFooter,
   decorateButtons,
-  decorateIcons,
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
@@ -12,6 +11,31 @@ import {
   loadSections,
   loadCSS,
 } from './aem.js';
+
+/**
+ * Decorates a single icon span using Line Icons syntax.
+ * Replaces the authored `<span class="icon icon-{name}">` with
+ * `<i class="lni lni-{name}" aria-hidden="true"></i>`.
+ * @param {Element} span The span element with icon classes
+ */
+function decorateIconCustom(span) {
+  const iconClass = Array.from(span.classList).find((c) => c.startsWith('icon-'));
+  if (!iconClass) return;
+  const iconName = iconClass.substring(5);
+  const i = document.createElement('i');
+  i.classList.add('lni', `lni-${iconName}`);
+  i.setAttribute('aria-hidden', 'true');
+  span.append(i);
+}
+
+/**
+ * Decorates all icon spans in an element using Line Icons syntax.
+ * Each `<span class="icon icon-{name}">` receives an `<i class="lni lni-{name}">` child.
+ * @param {Element} element The container element to search for icon spans
+ */
+export function decorateIconsCustom(element) {
+  element.querySelectorAll('span.icon').forEach(decorateIconCustom);
+}
 
 /**
  * Encodes a plain-text string for safe use inside an HTML attribute value.
@@ -98,7 +122,7 @@ function buildAutoBlocks(main) {
 export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
-  decorateIcons(main);
+  decorateIconsCustom(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
