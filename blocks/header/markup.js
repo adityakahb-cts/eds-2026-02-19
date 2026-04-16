@@ -153,99 +153,93 @@ export const CONTENT_MODEL_SPEC = {
 /**
  * Root header shell.
  * Tokens:
- *   {logoLight}        – src for light-mode logo img
- *   {logoDark}         – src for dark-mode logo img
- *   {hamburgerIcon}    – inner HTML for the hamburger button (icon element)
- *   {hamburgerLabel}   – aria-label for the hamburger button
- *   {navItems}         – rendered NAV_ITEM_MARKUP instances joined as a string
- *   {searchIcon}       – inner HTML for the search toggle button (icon element)
- *   {searchLabel}      – aria-label for the search toggle button and input
- *   {searchPlaceholder}– placeholder for the search input
- *   {searchSubmitText} – label for the search submit button
+ *   {logoLight}      – src for the light-mode logo img
+ *   {logoDark}       – src for the dark-mode logo img
+ *   {navItems}       – rendered NAV_ITEM_MARKUP instances joined as a string
+ *   {hamburgerIcon}  – inner HTML for the hamburger button icon
+ *   {hamburgerLabel} – aria-label for the hamburger button
  */
 export const HEADER_MARKUP = /* html */`
-<div class="nav-wrapper">
-  <nav id="nav" aria-expanded="false">
-    <div class="nav-hamburger">
-      <button
-        type="button"
-        class="nav-hamburger-btn"
-        aria-label="{hamburgerLabel}"
-        aria-controls="nav"
-        aria-expanded="false"
-      >
-        {hamburgerIcon}
-      </button>
+<div class="position-fixed top-0 left-0 w-100 z-1000">
+  <header
+    class="max-wrap-lg d-flex justify-content-between align-items-center bg-c-white-translucent position-relative"
+  >
+    <div class="siteheader dashed-bottom dashed-bottom-white-translucent w-100">
+      <div class="max-wrap">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col d-flex justify-content-between align-items-center">
+              <div class="siteheader-logo py-2">
+                <a href="/" aria-label="Go to home">
+                  <img
+                    class="siteheader-logo-light"
+                    src="{logoLight}"
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                  />
+                  <img
+                    class="siteheader-logo-dark"
+                    src="{logoDark}"
+                    alt=""
+                    loading="eager"
+                    decoding="async"
+                  />
+                </a>
+              </div>
+              <nav class="d-none d-xl-block siteheader-nav" aria-label="Main navigation">
+                <ul class="d-flex m-0 p-0 list-unstyled gap-2">
+                  {navItems}
+                </ul>
+              </nav>
+              <div class="siteheader-right d-flex justify-content-end">
+                <a
+                  href="/contact"
+                  class="btn btn-secondary rounded-pill ms-2 ms-xl-4 p-2 order-1 order-xl-1 px-xl-3 d-none d-md-inline-flex"
+                >
+                  <span class="icon-gm m-0 me-md-2 lh-1" aria-hidden="true">phone_in_talk</span>
+                  <span class="lh-1">Contact Us</span>
+                </a>
+                <button
+                  class="btn btn-primary rounded-pill p-2 d-xl-none ms-2 order-2"
+                  type="button"
+                  data-bs-toggle="offcanvas"
+                  data-bs-target="#mobilenav"
+                  aria-controls="mobilenav"
+                  aria-label="{hamburgerLabel}"
+                >
+                  {hamburgerIcon}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
-
-    <div class="nav-brand">
-      <a href="/" aria-label="Go to home">
-        <picture class="nav-logo-light">
-          <img
-            src="{logoLight}"
-            alt=""
-            loading="eager"
-            decoding="async"
-          />
-        </picture>
-        <picture class="nav-logo-dark">
-          <img
-            src="{logoDark}"
-            alt=""
-            loading="eager"
-            decoding="async"
-          />
-        </picture>
-      </a>
-    </div>
-
-    <div class="nav-sections">
-      <ul role="list">
-        {navItems}
-      </ul>
-    </div>
-
-    <div class="nav-tools">
-      <button
-        type="button"
-        class="nav-search-toggle"
-        aria-label="{searchLabel}"
-        aria-expanded="false"
-        aria-controls="nav-search-form"
-      >
-        {searchIcon}
-      </button>
-      <form
-        class="nav-search-form"
-        id="nav-search-form"
-        role="search"
-        hidden
-      >
-        <input
-          type="search"
-          class="nav-search-input"
-          placeholder="{searchPlaceholder}"
-          aria-label="{searchLabel}"
-        />
-        <button type="submit" class="nav-search-submit">
-          {searchSubmitText}
-        </button>
-      </form>
-    </div>
-  </nav>
+  </header>
 </div>
 `;
 
 /**
  * A single top-level navigation item, with an optional megamenu panel.
  * Tokens:
- *   {mainLink}    – outerHTML of the authored heading/anchor element
- *   {megamenu}    – rendered MEGAMENU_MARKUP, or empty string for plain links
- *   {dropClass}   – 'nav-drop' when a megamenu is present, otherwise ''
+ *   {mainLinkHref}   – href for the top-level nav anchor
+ *   {mainLinkText}   – display text for the top-level nav anchor
+ *   {megamenuAttrs}  – aria-haspopup/aria-expanded/aria-controls attrs when megamenu is
+ *                      present, otherwise empty string
+ *   {dropIcon}       – keyboard_arrow_down icon span for megamenu items, otherwise empty string
+ *   {megamenu}       – rendered MEGAMENU_MARKUP, or empty string for plain links
  */
 export const NAV_ITEM_MARKUP = /* html */`
-<li class="nav-item {dropClass}">
-  {mainLink}
+<li class="">
+  <h2 class="h6 m-0 fw-medium fs-body-lg">
+    <a
+      href="{mainLinkHref}"
+      class="siteheader-navlink px-3 py-2 link-offset-2 link-offset-3-hover link-underline
+        link-underline-opacity-0 d-flex justify-content-center align-items-center"
+      {megamenuAttrs}
+    ><span>{mainLinkText}</span>{dropIcon}</a>
+  </h2>
   {megamenu}
 </li>
 `;
@@ -253,16 +247,27 @@ export const NAV_ITEM_MARKUP = /* html */`
 /**
  * Megamenu panel shown when a nav item is expanded.
  * Tokens:
- *   {image}       – outerHTML of the authored picture element, or empty string
- *   {landingLink} – outerHTML of the primary landing-page heading/anchor
- *   {subnavs}     – rendered SUBNAV_MARKUP instances joined as a string
+ *   {megamenuId}      – id attribute value (matched by aria-controls on the trigger)
+ *   {megamenuLabel}   – aria-label for the panel region (= nav item text)
+ *   {image}           – img element HTML for the panel image, or empty string
+ *   {landingContent}  – landing link heading outerHTML and any description paragraphs
+ *   {subnavs}         – rendered SUBNAV_MARKUP instances joined as a string
  */
 export const MEGAMENU_MARKUP = /* html */`
-<div class="nav-megamenu" hidden>
-  <div class="nav-megamenu-image">{image}</div>
-  <div class="nav-megamenu-content">
-    <div class="nav-megamenu-landing">{landingLink}</div>
-    <div class="nav-megamenu-subnavs">{subnavs}</div>
+<div
+  class="max-wrap-lg position-absolute top-100 start-0 w-100 siteheader-subnav z-21"
+  id="{megamenuId}"
+  role="region"
+  aria-label="{megamenuLabel}"
+>
+  <div class="max-wrap">
+    <div class="container-fluid py-4">
+      <div class="row">
+        <div class="col-4 siteheader-megamenu-image">{image}</div>
+        <div class="col-4 siteheader-megamenu-landing">{landingContent}</div>
+        <div class="col-4 siteheader-megamenu-subnavs">{subnavs}</div>
+      </div>
+    </div>
   </div>
 </div>
 `;
@@ -270,10 +275,10 @@ export const MEGAMENU_MARKUP = /* html */`
 /**
  * One sub-navigation link group inside a megamenu panel.
  * Tokens:
- *   {items} – <li> elements for each sub-nav link
+ *   {items} – rendered SUBNAV_ITEM_MARKUP instances joined as a string
  */
 export const SUBNAV_MARKUP = /* html */`
-<ul class="nav-subnav" role="list">
+<ul class="list-unstyled d-block">
   {items}
 </ul>
 `;
@@ -284,7 +289,7 @@ export const SUBNAV_MARKUP = /* html */`
  *   {link} – outerHTML of the authored anchor element
  */
 export const SUBNAV_ITEM_MARKUP = /* html */`
-<li class="nav-subnav-item">{link}</li>
+<li class="d-flex">{link}</li>
 `;
 
 export default HEADER_MARKUP;

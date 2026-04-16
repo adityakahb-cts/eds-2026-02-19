@@ -1,20 +1,8 @@
-footer {
-  background-color: var(--light-color);
-  font-size: var(--font-size-small);
-}
-
-footer .footer > div {
-  margin: auto;
-  max-width: 1200px;
-  padding: 40px 24px 24px;
-}
-
-footer .footer p {
-  margin: 0;
-}
-
-@media (width >= 992px) {
-  footer .footer > div {
-    padding: 40px 32px 24px;
-  }
-}
+/* All footer styles are split into breakpoint partials in ./styles/. */
+/* Add new rules to the appropriate partial, not directly in this file.  */
+@import './styles/default.css';
+@import './styles/sm.css';
+@import './styles/md.css';
+@import './styles/lg.css';
+@import './styles/xl.css';
+@import './styles/xxl.css';

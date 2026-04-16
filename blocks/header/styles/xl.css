@@ -1,0 +1,16 @@
+/* @media (width >= 1272px) — desktop nav is visible; megamenu hover/focus behaviours */
+@media (width >= 1272px) {
+  /* Show megamenu on hover over its parent nav item */
+  header .siteheader-nav li:hover .siteheader-subnav,
+  /* Show megamenu when the trigger link is keyboard-expanded */
+  header .siteheader-nav li:has(.siteheader-navlink[aria-expanded='true']) .siteheader-subnav {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Highlight active nav link when its megamenu is open */
+  header .siteheader-navlink[aria-expanded='true'] {
+    color: var(--color-primary);
+  }
+}

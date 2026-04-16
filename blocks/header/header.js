@@ -9,6 +9,9 @@ import {
   SUBNAV_ITEM_MARKUP,
 } from './markup.js';
 
+/** Counter used to generate unique megamenu panel IDs within a single decorate call. */
+let megamenuCounter = 0;
+
 /**
  * Returns the trimmed text content of an element, or '' if the element is falsy.
  * @param {Element|null} el The element to read
@@ -31,7 +34,7 @@ function getIconHtml(el) {
 }
 
 /**
- * Renders one or more SUBNAV_MARKUP blocks from an array of <ul> elements.
+ * Renders SUBNAV_MARKUP instances from an array of <ul> elements.
  * @param {Element[]} lists Array of <ul> elements from the megamenu content cell
  * @returns {string} Rendered subnav HTML
  */
@@ -47,8 +50,8 @@ function renderSubnavs(lists) {
 
 /**
  * Renders all top-level NAV_ITEM_MARKUP entries from the navigation block.
- * Each block row maps to one nav item; rows with content in cells 2 or 3
- * get a megamenu panel, otherwise a plain link is rendered.
+ * Rows with content in cell 2 or cell 3 get a MEGAMENU_MARKUP panel;
+ * all other rows render as plain links.
  * @param {Element|null} navBlock The navigation block element
  * @returns {string} Rendered nav items HTML
  */
@@ -57,43 +60,66 @@ function renderNavItems(navBlock) {
   return [...navBlock.children].map((row) => {
     const [cell1, cell2, cell3] = row.children;
 
+    // Main link text from cell 1 heading; href from cell 3's first anchor
     const heading = cell1 ? cell1.querySelector('h2, h3') : null;
-    let mainLink = '';
-    if (heading) mainLink = heading.outerHTML;
-    else if (cell1) mainLink = cell1.innerHTML;
+    const mainLinkText = getText(heading || cell1);
+    const landingAnchor = cell3 ? cell3.querySelector('a') : null;
+    const mainLinkHref = landingAnchor ? landingAnchor.getAttribute('href') : '#';
 
     const hasMegamenu = (cell2 && cell2.innerHTML.trim()) || (cell3 && cell3.innerHTML.trim());
     let megamenu = '';
-    let dropClass = '';
+    let megamenuAttrs = '';
+    let dropIcon = '';
 
     if (hasMegamenu) {
-      const image = cell2 ? cell2.innerHTML.trim() : '';
+      megamenuCounter += 1;
+      const megamenuId = `siteheader-megamenu-${megamenuCounter}`;
+
+      // Image: prefer authored <img> from cell 2; picture tags are not forwarded
+      const imageEl = cell2 ? cell2.querySelector('img') : null;
+      const image = imageEl ? imageEl.outerHTML : '';
+
+      // Landing content: heading + any description paragraphs from cell 3
       const landingEl = cell3 ? cell3.querySelector('h2, h3') : null;
       const landingLink = landingEl ? landingEl.outerHTML : '';
+      const descHtml = cell3
+        ? [...cell3.querySelectorAll('p')].map((p) => p.outerHTML).join('')
+        : '';
+      const landingContent = landingLink + descHtml;
+
+      // Subnavs from direct <ul> children of cell 3
       const subnavs = renderSubnavs(cell3 ? [...cell3.querySelectorAll(':scope > ul')] : []);
 
       megamenu = MEGAMENU_MARKUP
-        .replace('{image}', image)
-        .replace('{landingLink}', landingLink)
-        .replace('{subnavs}', subnavs);
-      dropClass = 'nav-drop';
+        .replaceAll('{megamenuId}', megamenuId)
+        .replaceAll('{megamenuLabel}', encodeHtml(mainLinkText))
+        .replaceAll('{image}', image)
+        .replaceAll('{landingContent}', landingContent)
+        .replaceAll('{subnavs}', subnavs);
+
+      megamenuAttrs = `aria-haspopup="true" aria-expanded="false" aria-controls="${megamenuId}"`;
+      dropIcon = '';
     }
 
     return NAV_ITEM_MARKUP
-      .replace('{mainLink}', mainLink)
-      .replace('{megamenu}', megamenu)
-      .replace('{dropClass}', dropClass);
+      .replaceAll('{mainLinkHref}', encodeHtml(mainLinkHref))
+      .replaceAll('{mainLinkText}', mainLinkText)
+      .replaceAll('{megamenuAttrs}', megamenuAttrs)
+      .replaceAll('{dropIcon}', dropIcon)
+      .replaceAll('{megamenu}', megamenu);
   }).join('');
 }
 
 /**
  * Loads and decorates the header, mainly the nav.
  * Fetches the nav fragment, extracts content from the logo, navigation,
- * search, and hamburger sub-blocks, then interpolates everything into
- * the HEADER_MARKUP template from markup.js.
+ * and hamburger sub-blocks, then interpolates everything into the
+ * HEADER_MARKUP template from markup.js.
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
+  megamenuCounter = 0;
+
   // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
@@ -102,7 +128,6 @@ export default async function decorate(block) {
   // locate sub-blocks within the fragment
   const logoBlock = fragment ? fragment.querySelector('[data-block-name="logo"]') : null;
   const navBlock = fragment ? fragment.querySelector('[data-block-name="navigation"]') : null;
-  const searchBlock = fragment ? fragment.querySelector('[data-block-name="search"]') : null;
   const hamburgerBlock = fragment ? fragment.querySelector('[data-block-name="hamburger"]') : null;
 
   // logo – row 1: cell 1 = light src, cell 2 = dark src
@@ -115,13 +140,6 @@ export default async function decorate(block) {
   const hamburgerIcon = getIconHtml(hamburgerRow ? hamburgerRow.children[0] : null);
   const hamburgerLabel = getText(hamburgerRow ? hamburgerRow.children[1] : null) || 'Open navigation';
 
-  // search – row 1: cell 1 = icon, cell 2 = label, cell 3 = placeholder, cell 4 = submit text
-  const searchRow = searchBlock ? searchBlock.children[0] : null;
-  const searchIcon = getIconHtml(searchRow ? searchRow.children[0] : null);
-  const searchLabel = getText(searchRow ? searchRow.children[1] : null) || 'Search';
-  const searchPlaceholder = getText(searchRow ? searchRow.children[2] : null) || 'Search...';
-  const searchSubmitText = getText(searchRow ? searchRow.children[3] : null) || 'Search';
-
   // nav items – one row per megamenu entry
   const navItems = renderNavItems(navBlock);
 
@@ -129,22 +147,7 @@ export default async function decorate(block) {
   block.innerHTML = HEADER_MARKUP
     .replaceAll('{logoLight}', encodeHtml(logoLight))
     .replaceAll('{logoDark}', encodeHtml(logoDark))
-    .replaceAll('{hamburgerIcon}', hamburgerIcon)
-    .replaceAll('{hamburgerLabel}', encodeHtml(hamburgerLabel))
     .replaceAll('{navItems}', navItems)
-    .replaceAll('{searchIcon}', searchIcon)
-    .replaceAll('{searchLabel}', encodeHtml(searchLabel))
-    .replaceAll('{searchPlaceholder}', encodeHtml(searchPlaceholder))
-    .replaceAll('{searchSubmitText}', encodeHtml(searchSubmitText));
-
-  // hamburger toggle: flip aria-expanded on the nav and the button
-  const nav = block.querySelector('#nav');
-  const hamburgerBtn = block.querySelector('.nav-hamburger-btn');
-  if (nav && hamburgerBtn) {
-    hamburgerBtn.addEventListener('click', () => {
-      const expanded = nav.getAttribute('aria-expanded') === 'true';
-      nav.setAttribute('aria-expanded', String(!expanded));
-      hamburgerBtn.setAttribute('aria-expanded', String(!expanded));
-    });
-  }
+    .replaceAll('{hamburgerIcon}', hamburgerIcon)
+    .replaceAll('{hamburgerLabel}', encodeHtml(hamburgerLabel));
 }

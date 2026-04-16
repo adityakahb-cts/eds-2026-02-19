@@ -72,6 +72,50 @@ The block fetches the navigation fragment automatically — no fields are author
 
 ---
 
+## Rendered markup and CSS
+
+The block renders into a fixed-position shell using Bootstrap-style utility classes plus the following block-scoped classes. Add styles to the matching breakpoint partial in `./styles/` — never directly to `header.css`.
+
+### CSS class reference
+
+| Class | Element | Purpose |
+|---|---|---|
+| `.siteheader` | `<div>` | Top-level header content wrapper |
+| `.siteheader-logo` | `<div>` | Logo container |
+| `.siteheader-logo-light` | `<img>` | Logo image shown in light mode |
+| `.siteheader-logo-dark` | `<img>` | Logo image shown in dark mode (hidden by default; revealed by `[data-eds-theme='dark']` or `prefers-color-scheme: dark`) |
+| `.siteheader-nav` | `<nav>` | Desktop navigation (hidden below xl via utility classes) |
+| `.siteheader-navlink` | `<a>` | Top-level navigation anchor; receives `aria-haspopup`, `aria-expanded`, and `aria-controls` when a megamenu is present |
+| `.siteheader-right` | `<div>` | Wrapper for the contact CTA and mobile hamburger button |
+| `.siteheader-subnav` | `<div>` | Megamenu panel — hidden by default (`visibility: hidden; opacity: 0`) and revealed at `≥ 1272px` on hover or when the trigger link has `aria-expanded="true"` |
+| `.siteheader-megamenu-image` | `<div>` | Left column of the megamenu panel; contains the representative image |
+| `.siteheader-megamenu-landing` | `<div>` | Centre column; contains the section's primary landing-page link and optional description |
+| `.siteheader-megamenu-subnavs` | `<div>` | Right column; contains up to two `<ul>` sub-navigation link groups |
+
+### Breakpoint partials
+
+Styles are split across `./styles/` partials imported by `header.css`. Each partial targets a single breakpoint:
+
+| File | Breakpoint | Contains |
+|---|---|---|
+| `default.css` | all (mobile-first base) | Logo light/dark swap, nav-link colours and focus rings, megamenu hidden state, megamenu content link styles |
+| `sm.css` | `≥ 632px` | _(reserved — add overrides here)_ |
+| `md.css` | `≥ 760px` | _(reserved — add overrides here)_ |
+| `lg.css` | `≥ 992px` | _(reserved — add overrides here)_ |
+| `xl.css` | `≥ 1272px` | Megamenu show on hover / `aria-expanded="true"`, active nav-link highlight |
+| `xxl.css` | `≥ 1432px` | _(reserved — add overrides here)_ |
+
+### Megamenu open/close
+
+The megamenu uses CSS `visibility` + `opacity` transitions (not `display`) so the fade animation plays on both open and close. It is activated in two ways:
+
+1. **Hover** — `li:hover .siteheader-subnav` (no JS required).
+2. **Keyboard** — JS sets `aria-expanded="true"` on `.siteheader-navlink`; the rule `li:has(.siteheader-navlink[aria-expanded='true']) .siteheader-subnav` reveals the panel.
+
+Both rules live in `styles/xl.css` and only take effect at `width ≥ 1272px`, where the desktop nav is visible.
+
+---
+
 ## Testing
 
 | File | Purpose |
