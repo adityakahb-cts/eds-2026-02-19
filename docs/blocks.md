@@ -301,30 +301,51 @@ Do **not** use the classes `{blockname}-container` or `{blockname}-wrapper` in y
 
 ## Responsive Design
 
-Write styles mobile-first. Use `min-width` media queries at the project's standard breakpoints:
+This is a **mobile-first** project. All base styles must target the smallest viewport. Use `min-width` (`width >=`) media queries to progressively layer in larger-screen styles. Never use `max-width` queries to override mobile styles from a desktop baseline.
 
-| Breakpoint | Width     | Target   |
-|------------|-----------|----------|
-| default    | < 600px   | mobile   |
-| tablet     | ≥ 600px   | tablet   |
-| desktop    | ≥ 900px   | desktop  |
-| wide       | ≥ 1200px  | wide     |
+### Breakpoints
+
+| Token | Literal value | Use for |
+|---|---|---|
+| `--breakpoint-sm` | `632px` | large phones / small tablets |
+| `--breakpoint-md` | `760px` | tablets |
+| `--breakpoint-lg` | `992px` | small desktops |
+| `--breakpoint-xl` | `1272px` | large desktops |
+| `--breakpoint-xxl` | `1432px` | wide screens |
+
+> CSS custom properties cannot be used inside `@media` conditions. Always write the literal `px` value in the query. The `--breakpoint-*` tokens are for JavaScript reference only (e.g. `getComputedStyle(document.documentElement).getPropertyValue('--breakpoint-lg')`).
+
+### Pattern
 
 ```css
-/* mobile (default) */
+/* ── mobile (default — all viewports) ── */
 .my-block .items {
   display: flex;
   flex-direction: column;
+  gap: var(--spacing-3);
 }
 
-/* desktop */
-@media (width >= 900px) {
+/* ── tablet and up ── */
+@media (width >= 760px) {
   .my-block .items {
     flex-direction: row;
-    gap: 24px;
+  }
+}
+
+/* ── desktop and up ── */
+@media (width >= 992px) {
+  .my-block .items {
+    gap: var(--spacing-4);
   }
 }
 ```
+
+### Rules
+
+- **Default styles are mobile styles.** Do not wrap any mobile rule in a media query.
+- **Only layer upward.** Each breakpoint adds or overrides — it never resets a larger-screen value for smaller screens.
+- **Use spacing tokens** (`--spacing-1` through `--spacing-5`) for gap, padding, and margin values rather than hard-coded `px` values.
+- **Use container queries** (`@container`) for layout decisions inside a block that depend on the block's own width, not the viewport width. Declare `container-type: inline-size` on the block root.
 
 ## Reusing aem.js Utilities
 
@@ -376,12 +397,45 @@ export default function decorate(block) {
 
 ## Accessibility
 
+All blocks must conform to **WCAG 2.1/2.2 Level AA** standards.
+
 - Use semantic HTML so assistive technologies can navigate the block without custom ARIA.
 - Add `aria-label` to icon-only buttons and controls.
 - Manage `aria-expanded` for any toggle or accordion pattern.
 - Ensure keyboard navigation works for all interactive elements (`tabindex`, `keydown` handlers for `Enter`/`Space`/`Escape`).
 - Do not remove focus outlines without providing an equivalent visual indicator.
 - Maintain a logical heading hierarchy — blocks should not introduce an `h1` or skip levels.
+
+### Color and Contrast
+
+Use the semantic color tokens from `styles/config/themes.css` — never hardcode hex or rgb values in blocks.
+
+**Contrast requirements (WCAG 1.4.3 / 1.4.11):**
+
+| Use | Minimum ratio | Token to use |
+|---|---|---|
+| Normal text on background | 4.5:1 | `--color-text` or `--color-{state}-text` |
+| Large text / UI components | 3:1 | `--color-{state}` (shade -600 light, -300 dark) |
+| Hover / active state vs page bg | 3:1 | `--color-{state}-hover` (shade -700 light, -200 dark) |
+| Focus ring vs page bg | 3:1 | `--color-{state}-focus` |
+
+**Focus rings (WCAG 2.4.11 / 2.4.13):**
+
+All interactive elements must have a visible `:focus-visible` style. Use the project's standard ring:
+
+```css
+.my-block a:focus-visible,
+.my-block button:focus-visible {
+  outline: 3px solid var(--color-primary-focus);
+  outline-offset: 2px;
+}
+```
+
+Replace `--color-primary-focus` with the appropriate semantic state token (`--color-danger-focus`, `--color-success-focus`, etc.) to match the component's role.
+
+**Dark mode:** semantic tokens (`--color-primary`, `--color-danger`, etc.) automatically resolve to their dark-mode values when `prefers-color-scheme: dark` is active or `data-eds-theme="dark"` is set on `<html>`. No per-block media queries are needed for color.
+
+**Warning state:** amber backgrounds require dark text. Always pair `background-color: var(--color-warning)` with `color: var(--color-warning-text)` — never white text on an amber background.
 
 ## Graceful Degradation
 

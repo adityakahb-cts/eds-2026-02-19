@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buttons — EDS Design System</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <style>
+    .demo-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-sticky);
+    }
+    .demo-nav .container { display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap; }
+    .demo-nav strong { font-size: 1rem; margin-right: auto; }
+    .demo-nav a { font-size: 0.875rem; color: var(--color-link); text-decoration: none; }
+    .demo-nav a:hover { text-decoration: underline; }
+
+    .page-title { margin-top: var(--spacing-7); margin-bottom: var(--spacing-2); }
+    .page-sub { color: var(--color-text-secondary); margin-bottom: var(--spacing-7); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--spacing-2);
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: var(--spacing-3);
+      margin-bottom: var(--spacing-4);
+    }
+
+    .demo-box {
+      padding: var(--spacing-5);
+      border-radius: var(--border-radius-m);
+      margin-bottom: var(--spacing-4);
+    }
+
+    /* Simple SVG icons for icon demos */
+    .demo-icon { width: 1em; height: 1em; display: inline-block; vertical-align: middle; }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <div class="container">
+      <strong><a href="index.html" style="color:inherit;text-decoration:none;">EDS Design System</a></strong>
+      <a href="colors.html">Colors</a>
+      <a href="typography.html">Typography</a>
+      <a href="buttons.html">Buttons</a>
+      <a href="forms.html">Forms</a>
+      <a href="grid.html">Grid</a>
+      <a href="utilities.html">Utilities</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Buttons</h1>
+      <p class="page-sub">Full button system from <code>buttons.css</code> — semantic color variants, sizes, outlined, pilled, icon placements, groups, and focus rings.</p>
+
+      <!-- SEMANTIC COLORS -->
+      <p class="section-label">Semantic Color Variants</p>
+      <div class="row">
+        <button class="btn btn--primary">Primary</button>
+        <button class="btn btn--secondary">Secondary</button>
+        <button class="btn btn--tertiary">Tertiary</button>
+        <button class="btn btn--danger">Danger</button>
+        <button class="btn btn--success">Success</button>
+        <button class="btn btn--info">Info</button>
+        <button class="btn btn--warning">Warning</button>
+      </div>
+
+      <!-- OUTLINED -->
+      <p class="section-label">Outlined Variant</p>
+      <div class="row">
+        <button class="btn btn--primary btn--outlined">Primary</button>
+        <button class="btn btn--secondary btn--outlined">Secondary</button>
+        <button class="btn btn--tertiary btn--outlined">Tertiary</button>
+        <button class="btn btn--danger btn--outlined">Danger</button>
+        <button class="btn btn--success btn--outlined">Success</button>
+        <button class="btn btn--info btn--outlined">Info</button>
+        <button class="btn btn--warning btn--outlined">Warning</button>
+      </div>
+
+      <!-- PILLED -->
+      <p class="section-label">Pilled Shape</p>
+      <div class="row">
+        <button class="btn btn--primary btn--pilled">Primary</button>
+        <button class="btn btn--secondary btn--pilled">Secondary</button>
+        <button class="btn btn--danger btn--pilled">Danger</button>
+        <button class="btn btn--primary btn--outlined btn--pilled">Outlined Pilled</button>
+      </div>
+
+      <!-- SIZES -->
+      <p class="section-label">Size Scale</p>
+      <div class="row" style="align-items: flex-end;">
+        <button class="btn btn--primary btn--sm">Small</button>
+        <button class="btn btn--primary">Medium (default)</button>
+        <button class="btn btn--primary btn--lg">Large</button>
+        <button class="btn btn--primary btn--xl">X-Large</button>
+      </div>
+      <div class="row" style="align-items: flex-end;">
+        <button class="btn btn--primary btn--outlined btn--sm">Small</button>
+        <button class="btn btn--primary btn--outlined">Medium</button>
+        <button class="btn btn--primary btn--outlined btn--lg">Large</button>
+        <button class="btn btn--primary btn--outlined btn--xl">X-Large</button>
+      </div>
+
+      <!-- ICONS -->
+      <p class="section-label">Icon Placements</p>
+      <div class="row">
+        <button class="btn btn--primary">
+          <span class="btn__icon btn__icon--left" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-3a.5.5 0 0 1 .5.5v2.5h2.5a.5.5 0 0 1 0 1H8.5V11.5a.5.5 0 0 1-1 0V9H5a.5.5 0 0 1 0-1h2.5V5.5A.5.5 0 0 1 8 5Z"/></svg>
+          </span>
+          Icon Left
+        </button>
+        <button class="btn btn--secondary">
+          Icon Right
+          <span class="btn__icon btn__icon--right" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16"><path d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8Zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0ZM4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5H4.5Z"/></svg>
+          </span>
+        </button>
+        <button class="btn btn--tertiary" title="Add item" aria-label="Add item">
+          <span class="btn__icon btn__icon--only" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16"><path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1ZM0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8Zm8-3a.5.5 0 0 1 .5.5v2.5h2.5a.5.5 0 0 1 0 1H8.5V11.5a.5.5 0 0 1-1 0V9H5a.5.5 0 0 1 0-1h2.5V5.5A.5.5 0 0 1 8 5Z"/></svg>
+          </span>
+        </button>
+        <button class="btn btn--danger btn--sm" title="Delete" aria-label="Delete item">
+          <span class="btn__icon btn__icon--only" aria-hidden="true">
+            <svg viewBox="0 0 16 16" fill="currentColor" width="16" height="16"><path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5ZM11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H2.506a.58.58 0 0 0-.01 0H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1h-.995a.59.59 0 0 0-.01 0H11Z"/></svg>
+          </span>
+        </button>
+      </div>
+
+      <!-- DISABLED -->
+      <p class="section-label">Disabled States</p>
+      <div class="row">
+        <button class="btn btn--primary" disabled>Primary Disabled</button>
+        <button class="btn btn--secondary" disabled>Secondary Disabled</button>
+        <button class="btn btn--danger btn--outlined" disabled>Outlined Disabled</button>
+        <button class="btn btn--success btn--pilled" disabled>Pilled Disabled</button>
+      </div>
+
+      <!-- BUTTON GROUPS -->
+      <p class="section-label">Button Groups</p>
+      <div class="row">
+        <div class="btn-group" role="group" aria-label="Text formatting">
+          <button class="btn btn--secondary">Bold</button>
+          <button class="btn btn--secondary">Italic</button>
+          <button class="btn btn--secondary">Underline</button>
+        </div>
+
+        <div class="btn-group" role="group" aria-label="Alignment">
+          <button class="btn btn--primary btn--outlined">Left</button>
+          <button class="btn btn--primary">Center</button>
+          <button class="btn btn--primary btn--outlined">Right</button>
+        </div>
+
+        <div class="btn-group" role="group" aria-label="Size picker">
+          <button class="btn btn--secondary btn--sm">S</button>
+          <button class="btn btn--secondary btn--sm">M</button>
+          <button class="btn btn--secondary btn--sm">L</button>
+          <button class="btn btn--secondary btn--sm">XL</button>
+        </div>
+      </div>
+
+      <!-- AEM GLOBAL BUTTON STYLE -->
+      <p class="section-label">Legacy AEM Button Style — globals.css</p>
+      <p style="font-size:0.875rem;color:var(--color-text-secondary);">The <code>a.button</code> and standalone <code>button</code> styles from <code>globals.css</code> used for CMS-authored links.</p>
+      <div class="row">
+        <a class="button" href="#">Primary Link Button</a>
+        <a class="button secondary" href="#">Secondary Link Button</a>
+        <button>Plain Button</button>
+      </div>
+
+      <!-- BORDER RADIUS UTILITIES ON BUTTONS -->
+      <p class="section-label">Per-Side Radius &amp; Focus Ring Utilities</p>
+      <div class="row">
+        <button class="btn btn--secondary rounded-top" style="border-radius-bottom-left:0;border-radius-bottom-right:0;">Rounded Top</button>
+        <button class="btn btn--secondary rounded-bottom">Rounded Bottom</button>
+        <button class="btn btn--secondary rounded-start">Rounded Start</button>
+        <button class="btn btn--secondary rounded-end">Rounded End</button>
+      </div>
+      <div class="row">
+        <button class="btn btn--secondary ring ring-primary">ring-primary</button>
+        <button class="btn btn--secondary ring ring-danger">ring-danger</button>
+        <button class="btn btn--secondary ring ring-success">ring-success</button>
+        <button class="btn btn--secondary ring ring-warning">ring-warning</button>
+      </div>
+
+      <!-- DARK BACKGROUND DEMO -->
+      <p class="section-label">On Dark Background</p>
+      <div class="demo-box" style="background:var(--color-neutral-900);">
+        <div class="row">
+          <button class="btn btn--primary">Primary</button>
+          <button class="btn btn--secondary">Secondary</button>
+          <button class="btn btn--primary btn--outlined">Outlined</button>
+          <button class="btn btn--primary btn--pilled">Pilled</button>
+          <button class="btn btn--danger">Danger</button>
+          <button class="btn btn--success">Success</button>
+        </div>
+      </div>
+
+      <div style="margin-bottom: var(--spacing-8);"></div>
+    </div>
+  </main>
+</body>
+</html>

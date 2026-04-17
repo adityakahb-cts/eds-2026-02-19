@@ -3,7 +3,6 @@ import {
   loadHeader,
   loadFooter,
   decorateButtons,
-  decorateIcons,
   decorateSections,
   decorateBlocks,
   decorateTemplateAndTheme,
@@ -12,6 +11,7 @@ import {
   loadSections,
   loadCSS,
 } from './aem.js';
+import { decorateIcons } from './config/global-decorators.js';
 
 /**
  * Encodes a plain-text string for safe use inside an HTML attribute value.

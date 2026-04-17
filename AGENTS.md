@@ -40,7 +40,18 @@ The repository provides the basic structure, blocks, and configuration needed to
 ├── styles/          # Global styles and CSS
     ├── styles.css          # Minimal global styling and layout for your website required for LCP
     ├── lazy-styles.css     # Additional global styling and layout for below the fold/post LCP content
-    └── fonts.css           # Font definitions
+    ├── fonts.css           # Font definitions
+    └── config/
+        ├── colors.css      # Raw palette tokens (--color-{hue}-{shade})
+        ├── themes.css      # Semantic tokens mapped to light/dark mode
+        ├── typography.css  # Links, headings, body text, code, tables
+        ├── grid.css        # Container, row/col flex grid, CSS Grid classes
+        ├── forms.css       # Input, textarea, select, checkbox, radio
+        ├── globals.css     # Body, header/footer chrome, images, buttons, sections
+        ├── normalize.css   # CSS reset, box-sizing, interpolate-size
+        ├── utilities.css   # Display, flex, spacing, text, z-index, animation helpers
+        ├── buttons.css     # .btn component system, border-colour utilities, per-side radius, focus rings
+        └── overrides.css   # Project-level token overrides — new developers edit only this file
 ├── scripts/         # JavaScript libraries and utilities
     ├── aem.js           # Core AEM Library for Edge Delivery page decoration logic (NEVER MODIFY THIS FILE)
     ├── scripts.js       # Global JavaScript utilities, main entry point for page decoration
@@ -65,12 +76,24 @@ The repository provides the basic structure, blocks, and configuration needed to
 ### CSS
 - Follow Stylelint standard configuration
 - Use modern CSS features (CSS Grid, Flexbox, CSS Custom Properties)
-- Maintain responsive design principles
-  - Declare styles mobile first, use `min-width` media queries at 600px/900px/1200px for tablet and desktop
+- **Mobile-first by default.** All base styles target the smallest viewport. Use `min-width` (`width >=`) media queries to progressively enhance for larger screens. Never use `max-width` queries.
+- Use the project's five standard breakpoints — always with the `width >=` syntax:
+
+  | Token | Value | Alias |
+  |---|---|---|
+  | `--breakpoint-sm` | `632px` | sm |
+  | `--breakpoint-md` | `760px` | md |
+  | `--breakpoint-lg` | `992px` | lg |
+  | `--breakpoint-xl` | `1272px` | xl |
+  | `--breakpoint-xxl` | `1432px` | xxl |
+
+  Note: CSS custom properties cannot be used inside `@media` rules — use the literal `px` values in media queries. The `--breakpoint-*` tokens are for JavaScript reference only.
+
 - Ensure all selectors are scoped to the block.
   - Bad: `.item-list`
-  - Good: `.{blockname} .item-list`   
+  - Good: `.{blockname} .item-list`
 - Avoid classes `{blockname}-container` and `{blockname}-wrapper` as those are used on sections and could be confusing.
+- **Project-wide CSS variable overrides go in `styles/config/overrides.css`** — it is loaded into the `overrides` cascade layer (highest priority) so no `!important` is needed. Block-level overrides belong on the block's own class selector, not on `:root`.
 
 ### HTML
 - Use semantic HTML5 elements
@@ -118,6 +141,38 @@ Use `curl` and `console.log` to inspect the HTML delivered by the backend and th
 
 Each block should be self-contained and re-useable, with CSS and JS files following the naming convention: `blockname.css`, `blockname.js`. Blocks should be responsive and accessible by default.
 
+**Demo blocks** — blocks that exist purely to showcase design system elements on documentation pages are prefixed with `_` (e.g. `_type-specimen`, `_grid-demo`, `_form-demo`). They follow the same file and decoration conventions as regular blocks but must never be used on production content pages.
+
+**Globally handled elements** — `button`, `form`, and `grid` are not implemented as blocks. Styles live in `styles/config/globals.css`, `styles/config/forms.css`, and `styles/config/grid.css` respectively.
+
+### Fragment-loading blocks
+
+Blocks that load a CMS fragment (header, footer, and any future fragment-driven block) must use `fetchFragmentHtml` from `scripts/config/fragment-loader.js` instead of calling `loadFragment` directly with the three-line meta/path/load boilerplate. Pass `loadFragment` as the first argument.
+
+```js
+import { loadFragment } from '../fragment/fragment.js';
+import { fetchFragmentHtml } from '../../scripts/config/fragment-loader.js';
+
+const fragmentHtml = await fetchFragmentHtml(loadFragment, 'nav', '/nav');
+if (!fragmentHtml) return;
+const fragment = document.createElement('div');
+fragment.innerHTML = fragmentHtml;
+```
+
+**Rule: capture outerHTML before building a block that loads a fragment.**
+
+1. Start the dev server (`aem up`).
+2. Call `fetchFragmentHtml` and temporarily log or save the result:
+   ```js
+   // Temporary — remove before committing
+   console.log('fragment outerHTML:', fragmentHtml);
+   ```
+3. Save the output to `tests/fragments/{blockname}-fragment-outerhtml.html` so it can be opened in an editor. This file is temporary — delete it before committing.
+4. Read that file to understand the decorated fragment structure (`data-block-name` attributes, row/cell layout) before writing any `querySelector` calls, `CONTENT_MODEL_SPEC` entries, or MARKUP templates in `markup.js`.
+5. Update `block.md` to reflect the cell structure observed in the outerHTML, then write the decoration code.
+
+If the fragment path is not obvious from context, ask the user before fetching.
+
 ### Auto-Blocking
 
 Auto-blocking is the process of creating blocks that aren't explicitly authored into the page based on patterns in the content. See the `buildAutoBlocks` function in `scripts.js`.
@@ -158,7 +213,12 @@ When adding a new block that requires browser-level testing, add a `{blockname}.
 - Ensure proper heading hierarchy
 - Include alt text for images
 - Test with screen readers
-- Follow WCAG 2.1 AA guidelines
+- Follow WCAG 2.1/2.2 Level AA guidelines
+- Use semantic color tokens from `styles/config/themes.css` for all color in blocks — never hardcode hex/rgb values
+- Text on backgrounds must meet ≥4.5:1 contrast (normal text) or ≥3:1 (large text / UI components)
+- Hover and active states must each meet ≥3:1 against the page background (use `--color-{state}-hover`, `--color-{state}-active`)
+- All interactive elements need a `:focus-visible` outline using `--color-{state}-focus` at `3px solid` (≥3:1 against adjacent background, WCAG 2.4.11 / 2.4.13)
+- Dark mode is handled automatically by the theme tokens — no per-block `prefers-color-scheme` media queries needed; use `data-eds-theme="dark"` / `"light"` on `<html>` for programmatic overrides
 
 ## Deployment
 
@@ -174,16 +234,34 @@ With this information, you can construct URLs for the preview environment (same 
 - **Production Live**: `https://main--{repo}--{owner}.aem.live/`
 - **Feature Preview**: `https://{branch}--{repo}--{owner}.aem.page/`
 
+### Pre-push cleanup
+
+**Before pushing any branch**, delete the following temporary artifacts. They are gitignored but must not be left in the working tree or accidentally committed:
+
+```bash
+rm -f __temp.html
+rm -rf test-results/
+```
+
+Also delete any temporary fragment inspection files created during development:
+
+```bash
+rm -f tests/fragments/*-fragment-outerhtml.html
+```
+
+These files (`__temp.html`, `test-results/`, fragment outerHTML dumps) are development-only and must never appear in a commit or pull request.
+
 ### Publishing Process
-1. Push changes to a feature branch
-2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
-3. Run a PageSpeed Insights check at https://developers.google.com/speed/pagespeed/insights/?url=YOUR_URL against the feature preview URL and fix any issues. Target a score of 100
-4. Open a pull request to merge changes to `main`
+1. Run the pre-push cleanup above
+2. Push changes to a feature branch
+3. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
+4. Run a PageSpeed Insights check at https://developers.google.com/speed/pagespeed/insights/?url=YOUR_URL against the feature preview URL and fix any issues. Target a score of 100
+5. Open a pull request to merge changes to `main`
    1. in the PR description, include a link to `https://{branch}--{repo}--{owner}.aem.page/{path}` with a path to a file that illustrates the change you've made. This is the same path you have been testing with locally. WITHOUT THIS YOUR PR WILL BE REJECTED
    2. If an existing page to demonstrate your changes doesn't exist, create test content as a static html file and ask the user for help copying it to a cms content page you can link in the PR
-5. use `gh pr checks` to verify the status of code synchronization, linting, and performance tests
-6. A human reviewer will review the code, inspect the provided URL and merge the PR
-7. AEM Code Sync updates the main branch for production
+6. use `gh pr checks` to verify the status of code synchronization, linting, and performance tests
+7. A human reviewer will review the code, inspect the provided URL and merge the PR
+8. AEM Code Sync updates the main branch for production
 
 ## Troubleshooting
 
