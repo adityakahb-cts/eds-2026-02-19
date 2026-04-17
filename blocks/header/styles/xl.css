@@ -1,9 +1,26 @@
-/* @media (width >= 1272px) — desktop nav is visible; megamenu hover/focus behaviours */
+/* @media (width >= 1272px) — desktop: increase header height to 96 px; enable megamenu */
 @media (width >= 1272px) {
-  /* Show megamenu on hover over its parent nav item */
-  header .siteheader-nav li:hover .siteheader-subnav,
-  /* Show megamenu when the trigger link is keyboard-expanded */
-  header .siteheader-nav li:has(.siteheader-navlink[aria-expanded='true']) .siteheader-subnav {
+  :root {
+    --nav-height: 96px;
+  }
+
+  /* Nav items fill the full header height so the click target spans the bar */
+  header .siteheader-nav-item {
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  /* Nav links fill the full header height for an even tap/click target */
+  header .siteheader-navlink {
+    height: var(--nav-height);
+    align-items: center;
+    border-radius: 0;
+    padding-inline: 0.875rem;
+  }
+
+  /* Show megamenu when the trigger link is click-expanded */
+  header .siteheader-nav-item:has(.siteheader-navlink[aria-expanded='true']) .siteheader-megamenu {
     visibility: visible;
     opacity: 1;
     pointer-events: auto;

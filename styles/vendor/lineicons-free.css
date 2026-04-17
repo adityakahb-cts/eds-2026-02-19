@@ -3,7 +3,7 @@
     font-style: normal;
     font-weight: normal;
     font-display: block;
-    src: url("../fonts/line-icons/lineicons-free.woff2") format("woff2");
+    src: url("../../fonts/line-icons/lineicons-free.woff2") format("woff2");
 }
 
 .lni:before {
@@ -2581,4 +2581,35 @@
 }
 .lni.lni-surfer-seo:before {
     content: "\f103";
+}
+
+/* ── Aliases for lni-icon-* class names used in authored markup ───────────
+   Authors sometimes prefix icon names with "icon-" (e.g. lni-icon-chevron-down).
+   These rules map those names to the same glyphs defined above.             */
+.lni.lni-icon-chevron-down:before {
+    content: "\e09e";
+}
+.lni.lni-icon-chevron-right:before {
+    content: "\e0a5";
+}
+.lni.lni-icon-chevron-left:before {
+    content: "\e0a0";
+}
+.lni.lni-icon-chevron-up:before {
+    content: "\e0a2";
+}
+.lni.lni-icon-menu-hamburger-1:before {
+    content: "\e1dc";
+}
+.lni.lni-icon-search-1:before {
+    content: "\e27c";
+}
+.lni.lni-icon-search-2:before {
+    content: "\e27d";
+}
+.lni.lni-icon-xmark:before {
+    content: "\e33c";
+}
+.lni.lni-icon-xmark-circle:before {
+    content: "\e33d";
 }

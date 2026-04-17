@@ -29,13 +29,14 @@ export const CONTENT_MODEL_SPEC = {
   },
 
   /**
-   * navigation block – one authored row per megamenu item.
+   * navigation block – one authored row per nav item.
    * Each row has three cells: main link | megamenu image | megamenu content.
+   * Rows with empty cells 2 and 3 render as plain links.
    */
   navItems: {
     type: 'array',
     required: true,
-    description: 'Megamenu navigation items. One navigation-block row per item.',
+    description: 'Navigation items. One navigation-block row per item.',
     itemShape: {
       /** Cell 1 – heading element containing the top-level nav anchor. */
       mainLink: {
@@ -44,20 +45,20 @@ export const CONTENT_MODEL_SPEC = {
         description: 'Top-level nav link. Authored as a heading (h2/h3) wrapping an anchor in cell 1.',
       },
 
-      /** Cell 2 + Cell 3 together form the megamenu panel. */
+      /** Cells 2 + 3 together form an optional megamenu panel. */
       megamenu: {
         type: 'object',
         required: false,
-        description: 'Megamenu subnav panel shown on hover/focus. Omit both cells to render a plain link.',
+        description: 'Megamenu subnav panel shown on hover/focus. Omit cells 2 and 3 to render a plain link.',
         shape: {
-          /** Cell 2 – picture element used as a decorative/related image in the panel. */
+          /** Cell 2 – representative image for the panel. */
           image: {
             type: 'picture',
             required: false,
             description: 'Related representation image shown inside the megamenu panel (cell 2).',
           },
 
-          /** Cell 3, first heading anchor – primary landing-page link for this section. */
+          /** Cell 3, first heading anchor – primary landing-page link. */
           landingLink: {
             type: 'link',
             required: true,
@@ -66,7 +67,6 @@ export const CONTENT_MODEL_SPEC = {
 
           /**
            * Cell 3, ul elements – up to two sub-navigation link lists.
-           * Each list is a <ul> whose <li> elements contain anchors.
            */
           subnavs: {
             type: 'array',
@@ -84,65 +84,79 @@ export const CONTENT_MODEL_SPEC = {
   },
 
   /**
-   * search block – single row with four cells:
-   *   icon | label | placeholder | submit button text
+   * navbuttons block – row 2 (search toggle): four cells:
+   *   open-icon | open-label | close-icon | close-label
    */
   search: {
     type: 'object',
     required: false,
-    description: 'Search configuration authored in the search block on the /nav page.',
+    description: 'Search toggle configuration — navbuttons block, row 2.',
     shape: {
-      /** Cell 1 – icon name or SVG src used for the search toggle button. */
+      /** Cell 1 – icon shown when search is closed (open state). */
       icon: {
         type: 'icon',
         required: true,
-        description: 'Icon name / SVG src for the search toggle button (search block, row 1, cell 1).',
+        description: 'Icon displayed on the search toggle when the panel is closed (navbuttons row 2, cell 1).',
       },
 
-      /** Cell 2 – accessible aria-label for the search toggle button and the search input. */
-      label: {
+      /** Cell 2 – aria-label used when search panel is closed. */
+      openLabel: {
         type: 'string',
         required: true,
-        description: 'Accessible aria-label for the search toggle button and the search input (cell 2).',
+        description: 'aria-label for the search toggle when the panel is closed, e.g. "Open Search" (cell 2).',
       },
 
-      /** Cell 3 – placeholder text shown inside the search input field. */
-      placeholder: {
-        type: 'string',
-        required: true,
-        description: 'Placeholder text for the search input field (search block, row 1, cell 3).',
+      /** Cell 3 – icon shown when search is open (close state). */
+      closeIcon: {
+        type: 'icon',
+        required: false,
+        description: 'Icon displayed on the search toggle when the panel is open, e.g. an X mark (cell 3). Falls back to the open icon.',
       },
 
-      /** Cell 4 – visible label / accessible text for the search form submit button. */
-      submitText: {
+      /** Cell 4 – aria-label used when search panel is open. */
+      closeLabel: {
         type: 'string',
-        required: true,
-        description: 'Label for the search form submit button (search block, row 1, cell 4).',
+        required: false,
+        description: 'aria-label for the search toggle when the panel is open, e.g. "Close Search" (cell 4). Falls back to openLabel.',
       },
     },
   },
 
   /**
-   * hamburger block – single row with two cells:
-   *   icon | label
+   * navbuttons block – row 1 (hamburger toggle): four cells:
+   *   open-icon | open-label | close-icon | close-label
    */
   hamburger: {
     type: 'object',
     required: true,
-    description: 'Hamburger menu button configuration authored in the hamburger block on the /nav page.',
+    description: 'Hamburger menu button configuration — navbuttons block, row 1.',
     shape: {
-      /** Cell 1 – icon name or SVG src used for the hamburger toggle button. */
+      /** Cell 1 – icon shown when mobile nav is closed (open state). */
       icon: {
         type: 'icon',
         required: true,
-        description: 'Icon name / SVG src for the hamburger toggle button (hamburger block, row 1, cell 1).',
+        description: 'Icon displayed on the hamburger button when the nav is closed (navbuttons row 1, cell 1).',
       },
 
-      /** Cell 2 – accessible aria-label for the hamburger toggle button. */
-      label: {
+      /** Cell 2 – aria-label used when mobile nav is closed. */
+      openLabel: {
         type: 'string',
         required: true,
-        description: 'Accessible aria-label for the hamburger toggle button (hamburger block, row 1, cell 2).',
+        description: 'aria-label for the hamburger button when the nav is closed, e.g. "Open Menu" (cell 2).',
+      },
+
+      /** Cell 3 – icon shown when mobile nav is open (close state). */
+      closeIcon: {
+        type: 'icon',
+        required: false,
+        description: 'Icon displayed on the hamburger button when the nav is open, e.g. an X mark (cell 3). Falls back to the open icon.',
+      },
+
+      /** Cell 4 – aria-label used when mobile nav is open. */
+      closeLabel: {
+        type: 'string',
+        required: false,
+        description: 'aria-label for the hamburger button when the nav is open, e.g. "Close Menu" (cell 4). Falls back to openLabel.',
       },
     },
   },
@@ -151,122 +165,147 @@ export const CONTENT_MODEL_SPEC = {
 // ─── Markup templates ────────────────────────────────────────────────────────
 
 /**
- * Root header shell.
+ * Root header shell rendered into block.innerHTML.
+ *
  * Tokens:
- *   {logoLight}      – src for the light-mode logo img
- *   {logoDark}       – src for the dark-mode logo img
- *   {navItems}       – rendered NAV_ITEM_MARKUP instances joined as a string
- *   {hamburgerIcon}  – inner HTML for the hamburger button icon
- *   {hamburgerLabel} – aria-label for the hamburger button
+ *   {logoLight}          – src for the light-mode logo img
+ *   {logoDark}           – src for the dark-mode logo img
+ *   {navItems}           – rendered NAV_ITEM_MARKUP instances joined as a string
+ *   {mobileNavItems}     – rendered mobile accordion items joined as a string
+ *   {searchIcon}         – innerHTML for the search toggle open-state icon
+ *   {searchCloseIcon}    – innerHTML for the search toggle close-state icon
+ *   {searchOpenLabel}    – aria-label when the search panel is closed
+ *   {searchCloseLabel}   – aria-label when the search panel is open
+ *   {searchPlaceholder}  – placeholder text for the search input
+ *   {searchSubmitText}   – label for the search form submit button
+ *   {hamburgerIcon}      – innerHTML for the hamburger open-state icon
+ *   {hamburgerCloseIcon} – innerHTML for the hamburger close-state icon
+ *   {hamburgerOpenLabel} – aria-label when the mobile nav is closed
+ *   {hamburgerCloseLabel}– aria-label when the mobile nav is open
  */
 export const HEADER_MARKUP = /* html */`
-<div class="position-fixed top-0 left-0 w-100 z-1000">
-  <header
-    class="max-wrap-lg d-flex justify-content-between align-items-center bg-c-white-translucent position-relative"
-  >
-    <div class="siteheader dashed-bottom dashed-bottom-white-translucent w-100">
-      <div class="max-wrap">
-        <div class="container-fluid">
-          <div class="row">
-            <div class="col d-flex justify-content-between align-items-center">
-              <div class="siteheader-logo py-2">
-                <a href="/" aria-label="Go to home">
-                  <img
-                    class="siteheader-logo-light"
-                    src="{logoLight}"
-                    alt=""
-                    loading="eager"
-                    decoding="async"
-                  />
-                  <img
-                    class="siteheader-logo-dark"
-                    src="{logoDark}"
-                    alt=""
-                    loading="eager"
-                    decoding="async"
-                  />
-                </a>
-              </div>
-              <nav class="d-none d-xl-block siteheader-nav" aria-label="Main navigation">
-                <ul class="d-flex m-0 p-0 list-unstyled gap-2">
-                  {navItems}
-                </ul>
-              </nav>
-              <div class="siteheader-right d-flex justify-content-end">
-                <a
-                  href="/contact"
-                  class="btn btn-secondary rounded-pill ms-2 ms-xl-4 p-2 order-1 order-xl-1 px-xl-3 d-none d-md-inline-flex"
-                >
-                  <span class="icon-gm m-0 me-md-2 lh-1" aria-hidden="true">phone_in_talk</span>
-                  <span class="lh-1">Contact Us</span>
-                </a>
-                <button
-                  class="btn btn-primary rounded-pill p-2 d-xl-none ms-2 order-2"
-                  type="button"
-                  data-bs-toggle="offcanvas"
-                  data-bs-target="#mobilenav"
-                  aria-controls="mobilenav"
-                  aria-label="{hamburgerLabel}"
-                >
-                  {hamburgerIcon}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+<div class="siteheader-bar w-100 position-fixed top-0 start-0 z-4">
+  <div class="siteheader-inner d-flex align-items-center justify-content-between">
+    <a href="/" class="siteheader-logo flex-shrink-0 d-flex align-items-center"
+       aria-label="Go to home">
+      <img
+        class="siteheader-logo-light"
+        src="{logoLight}"
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
+      <img
+        class="siteheader-logo-dark"
+        src="{logoDark}"
+        alt=""
+        loading="eager"
+        decoding="async"
+      />
+    </a>
+    <nav class="siteheader-nav d-none d-xl-flex" id="siteheader-nav"
+         aria-label="Main navigation">
+      <ul class="list-unstyled d-flex m-0 p-0 align-items-center" role="list">
+        {navItems}
+      </ul>
+    </nav>
+    <div class="siteheader-tools d-flex align-items-center gap-2 flex-shrink-0">
+      <button
+        class="siteheader-search-toggle"
+        type="button"
+        aria-label="{searchOpenLabel}"
+        aria-expanded="false"
+        aria-controls="siteheader-search"
+      >
+        <span class="siteheader-icon-open" aria-hidden="true">{searchIcon}</span>
+        <span class="siteheader-icon-close" aria-hidden="true">{searchCloseIcon}</span>
+      </button>
+      <button
+        class="siteheader-hamburger d-xl-none"
+        type="button"
+        aria-label="{hamburgerOpenLabel}"
+        aria-expanded="false"
+        aria-controls="siteheader-mobilenav"
+      >
+        <span class="siteheader-icon-open" aria-hidden="true">{hamburgerIcon}</span>
+        <span class="siteheader-icon-close" aria-hidden="true">{hamburgerCloseIcon}</span>
+      </button>
     </div>
-  </header>
+  </div>
 </div>
+<div class="siteheader-backdrop" aria-hidden="true"></div>
+<div class="siteheader-search" id="siteheader-search" hidden aria-hidden="true">
+  <form class="siteheader-search-inner" role="search" action="/search">
+    <label class="visually-hidden" for="siteheader-q">{searchOpenLabel}</label>
+    <input
+      id="siteheader-q"
+      class="siteheader-search-input flex-grow-1"
+      type="search"
+      name="q"
+      placeholder="{searchPlaceholder}"
+      autocomplete="off"
+    />
+    <button type="submit" class="siteheader-search-submit" aria-label="{searchSubmitText}">{searchIcon}</button>
+  </form>
+</div>
+<nav
+  class="siteheader-mobilenav d-xl-none"
+  id="siteheader-mobilenav"
+  aria-label="Mobile navigation"
+  aria-hidden="true"
+  hidden
+>
+  <ul class="list-unstyled m-0 p-0" role="list">
+    {mobileNavItems}
+  </ul>
+</nav>
 `;
 
 /**
- * A single top-level navigation item, with an optional megamenu panel.
+ * A single desktop top-level nav item with optional megamenu panel.
+ *
  * Tokens:
- *   {mainLinkHref}   – href for the top-level nav anchor
- *   {mainLinkText}   – display text for the top-level nav anchor
- *   {megamenuAttrs}  – aria-haspopup/aria-expanded/aria-controls attrs when megamenu is
- *                      present, otherwise empty string
- *   {dropIcon}       – keyboard_arrow_down icon span for megamenu items, otherwise empty string
- *   {megamenu}       – rendered MEGAMENU_MARKUP, or empty string for plain links
+ *   {mainLinkHref}  – href for the top-level anchor
+ *   {mainLinkText}  – display text for the top-level anchor
+ *   {megamenuAttrs} – aria-haspopup/aria-expanded/aria-controls when megamenu is present,
+ *                     otherwise empty string
+ *   {dropIcon}      – chevron icon span for megamenu items, otherwise empty string
+ *   {megamenu}      – rendered MEGAMENU_MARKUP, or empty string for plain links
  */
 export const NAV_ITEM_MARKUP = /* html */`
-<li class="">
-  <h2 class="h6 m-0 fw-medium fs-body-lg">
-    <a
-      href="{mainLinkHref}"
-      class="siteheader-navlink px-3 py-2 link-offset-2 link-offset-3-hover link-underline
-        link-underline-opacity-0 d-flex justify-content-center align-items-center"
-      {megamenuAttrs}
-    ><span>{mainLinkText}</span>{dropIcon}</a>
-  </h2>
+<li class="siteheader-nav-item">
+  <a
+    href="{mainLinkHref}"
+    class="siteheader-navlink d-flex align-items-center gap-1 fw-medium"
+    {megamenuAttrs}
+  ><span>{mainLinkText}</span>{dropIcon}</a>
   {megamenu}
 </li>
 `;
 
 /**
- * Megamenu panel shown when a nav item is expanded.
+ * Full-width megamenu panel. The panel spans the full header bar width; content is
+ * centred at max-width via .siteheader-megamenu-inner.
+ *
  * Tokens:
- *   {megamenuId}      – id attribute value (matched by aria-controls on the trigger)
- *   {megamenuLabel}   – aria-label for the panel region (= nav item text)
- *   {image}           – img element HTML for the panel image, or empty string
- *   {landingContent}  – landing link heading outerHTML and any description paragraphs
- *   {subnavs}         – rendered SUBNAV_MARKUP instances joined as a string
+ *   {megamenuId}     – id attribute value (matched by aria-controls on the trigger)
+ *   {megamenuLabel}  – aria-label for the panel region (= nav item text)
+ *   {image}          – img outerHTML for the panel image, or empty string
+ *   {landingContent} – landing heading outerHTML + optional description paragraphs
+ *   {subnavs}        – rendered SUBNAV_MARKUP instances joined as a string
  */
 export const MEGAMENU_MARKUP = /* html */`
 <div
-  class="max-wrap-lg position-absolute top-100 start-0 w-100 siteheader-subnav z-21"
+  class="siteheader-megamenu position-absolute start-0 w-100"
   id="{megamenuId}"
   role="region"
   aria-label="{megamenuLabel}"
 >
-  <div class="max-wrap">
-    <div class="container-fluid py-4">
-      <div class="row">
-        <div class="col-4 siteheader-megamenu-image">{image}</div>
-        <div class="col-4 siteheader-megamenu-landing">{landingContent}</div>
-        <div class="col-4 siteheader-megamenu-subnavs">{subnavs}</div>
-      </div>
+  <div class="siteheader-megamenu-inner">
+    <div class="row g-4">
+      <div class="col-3 siteheader-megamenu-image">{image}</div>
+      <div class="col-4 siteheader-megamenu-landing">{landingContent}</div>
+      <div class="col-5 siteheader-megamenu-subnavs d-flex gap-4">{subnavs}</div>
     </div>
   </div>
 </div>
@@ -274,22 +313,24 @@ export const MEGAMENU_MARKUP = /* html */`
 
 /**
  * One sub-navigation link group inside a megamenu panel.
+ *
  * Tokens:
  *   {items} – rendered SUBNAV_ITEM_MARKUP instances joined as a string
  */
 export const SUBNAV_MARKUP = /* html */`
-<ul class="list-unstyled d-block">
+<ul class="list-unstyled m-0 p-0 d-block">
   {items}
 </ul>
 `;
 
 /**
  * One sub-navigation link item.
+ *
  * Tokens:
  *   {link} – outerHTML of the authored anchor element
  */
 export const SUBNAV_ITEM_MARKUP = /* html */`
-<li class="d-flex">{link}</li>
+<li>{link}</li>
 `;
 
 export default HEADER_MARKUP;

@@ -1,1 +1,6 @@
-/* @media (width >= 760px) — no header-specific overrides at this breakpoint */
+/* @media (width >= 760px) — tablet: increase header height to 84 px */
+@media (width >= 760px) {
+  :root {
+    --nav-height: 84px;
+  }
+}

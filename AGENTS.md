@@ -145,6 +145,34 @@ Each block should be self-contained and re-useable, with CSS and JS files follow
 
 **Globally handled elements** — `button`, `form`, and `grid` are not implemented as blocks. Styles live in `styles/config/globals.css`, `styles/config/forms.css`, and `styles/config/grid.css` respectively.
 
+### Fragment-loading blocks
+
+Blocks that load a CMS fragment (header, footer, and any future fragment-driven block) must use `fetchFragmentHtml` from `scripts/config/fragment-loader.js` instead of calling `loadFragment` directly with the three-line meta/path/load boilerplate. Pass `loadFragment` as the first argument.
+
+```js
+import { loadFragment } from '../fragment/fragment.js';
+import { fetchFragmentHtml } from '../../scripts/config/fragment-loader.js';
+
+const fragmentHtml = await fetchFragmentHtml(loadFragment, 'nav', '/nav');
+if (!fragmentHtml) return;
+const fragment = document.createElement('div');
+fragment.innerHTML = fragmentHtml;
+```
+
+**Rule: capture outerHTML before building a block that loads a fragment.**
+
+1. Start the dev server (`aem up`).
+2. Call `fetchFragmentHtml` and temporarily log or save the result:
+   ```js
+   // Temporary — remove before committing
+   console.log('fragment outerHTML:', fragmentHtml);
+   ```
+3. Save the output to `tests/fragments/{blockname}-fragment-outerhtml.html` so it can be opened in an editor. This file is temporary — delete it before committing.
+4. Read that file to understand the decorated fragment structure (`data-block-name` attributes, row/cell layout) before writing any `querySelector` calls, `CONTENT_MODEL_SPEC` entries, or MARKUP templates in `markup.js`.
+5. Update `block.md` to reflect the cell structure observed in the outerHTML, then write the decoration code.
+
+If the fragment path is not obvious from context, ask the user before fetching.
+
 ### Auto-Blocking
 
 Auto-blocking is the process of creating blocks that aren't explicitly authored into the page based on patterns in the content. See the `buildAutoBlocks` function in `scripts.js`.
@@ -206,16 +234,34 @@ With this information, you can construct URLs for the preview environment (same 
 - **Production Live**: `https://main--{repo}--{owner}.aem.live/`
 - **Feature Preview**: `https://{branch}--{repo}--{owner}.aem.page/`
 
+### Pre-push cleanup
+
+**Before pushing any branch**, delete the following temporary artifacts. They are gitignored but must not be left in the working tree or accidentally committed:
+
+```bash
+rm -f __temp.html
+rm -rf test-results/
+```
+
+Also delete any temporary fragment inspection files created during development:
+
+```bash
+rm -f tests/fragments/*-fragment-outerhtml.html
+```
+
+These files (`__temp.html`, `test-results/`, fragment outerHTML dumps) are development-only and must never appear in a commit or pull request.
+
 ### Publishing Process
-1. Push changes to a feature branch
-2. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
-3. Run a PageSpeed Insights check at https://developers.google.com/speed/pagespeed/insights/?url=YOUR_URL against the feature preview URL and fix any issues. Target a score of 100
-4. Open a pull request to merge changes to `main`
+1. Run the pre-push cleanup above
+2. Push changes to a feature branch
+3. AEM Code Sync automatically processes changes making them available on feature preview environment for that branch
+4. Run a PageSpeed Insights check at https://developers.google.com/speed/pagespeed/insights/?url=YOUR_URL against the feature preview URL and fix any issues. Target a score of 100
+5. Open a pull request to merge changes to `main`
    1. in the PR description, include a link to `https://{branch}--{repo}--{owner}.aem.page/{path}` with a path to a file that illustrates the change you've made. This is the same path you have been testing with locally. WITHOUT THIS YOUR PR WILL BE REJECTED
    2. If an existing page to demonstrate your changes doesn't exist, create test content as a static html file and ask the user for help copying it to a cms content page you can link in the PR
-5. use `gh pr checks` to verify the status of code synchronization, linting, and performance tests
-6. A human reviewer will review the code, inspect the provided URL and merge the PR
-7. AEM Code Sync updates the main branch for production
+6. use `gh pr checks` to verify the status of code synchronization, linting, and performance tests
+7. A human reviewer will review the code, inspect the provided URL and merge the PR
+8. AEM Code Sync updates the main branch for production
 
 ## Troubleshooting
 
