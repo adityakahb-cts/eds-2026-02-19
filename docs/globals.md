@@ -122,6 +122,184 @@ Do not load fonts anywhere else. The `localhost` guard prevents sessionStorage f
 
 ---
 
+## Regen Directives (`scripts/config/global-decorators.js`)
+
+Regen directives let authors embed declarative markup instructions directly in page content. `decorateRegenElements(main)` — called from `decorateMain` — finds every `{{regen:start;...}} … {{regen:end}}` pair and replaces the enclosed content with the specified element.
+
+### Syntax
+
+```
+{{regen:start;element:<type>;<key>:<value>;…}}
+  [authored content between markers]
+{{regen:end}}
+```
+
+**CSS keys** (`element`, `theme`, `style`, `size`, `level`, `author`, `source`) drive class/tag logic and are never set as HTML attributes. All other keys are applied as HTML attributes verbatim (`href`, `alt`, `width`, `target`, `aria-label`, etc.).
+
+### Supported elements
+
+#### `element:anchor`
+
+Enhances an existing `<a>` in place, or creates a new one if none is found. Receives the full `.btn` class system.
+
+```
+{{regen:start;element:anchor;theme:primary;style:solid;size:large;target:blank;title:"Go"}}
+Link Text
+{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Adds `.btn--{theme}` |
+| `style` | `solid` (default, no class) · `outlined` | Adds `.btn--outlined` |
+| `size` | `small`/`sm` · `medium`/`md` (default) · `large`/`lg` · `extra-large`/`xl` | Adds `.btn--{size}` |
+| All others | any string | Set as HTML attribute |
+
+#### `element:button`
+
+Always produces a `<button type="button">`. Same `theme`/`style`/`size` class system as `anchor`.
+
+```
+{{regen:start;element:button;theme:danger;style:outlined;aria-label:"Remove item"}}
+Delete
+{{regen:end}}
+```
+
+#### `element:image`
+
+Produces an `<img>`. Place an `<a>` between the markers — its `href` becomes the `img src`. If the anchor has a `target` the image is wrapped in a link.
+
+```
+{{regen:start;element:image;alt:"Hero image";width:1200;height:600;loading:lazy}}
+<a href="/media/hero.jpg" target="_blank">Hero</a>
+{{regen:end}}
+```
+
+| Param | Effect |
+|---|---|
+| `alt`, `width`, `height`, `loading`, … | Set as `<img>` attributes |
+| Anchor `href` | Becomes `img.src` (and `a.href` when target is present) |
+| Anchor `target` | Wraps the image in `<a href target>` |
+
+#### `element:paragraph`
+
+Produces a `<p>`. `style` generates a BEM modifier class.
+
+```
+{{regen:start;element:paragraph;style:intro}}
+Introductory copy that renders larger than body text.
+{{regen:end}}
+```
+
+| `style` value | Class added | Visual result |
+|---|---|---|
+| `intro` | `.paragraph--intro` | `--font-size-intro`, weight 300, line-height 1.5 |
+| *(absent)* | — | Default `<p>` styling |
+
+#### `element:blockquote`
+
+Produces a `<blockquote>`. `author` and `source` generate a `<footer>` with `<cite>` and `.blockquote__source`.
+
+```
+{{regen:start;element:blockquote;author:"Jane Austen";source:"Pride and Prejudice"}}
+<p>It is a truth universally acknowledged…</p>
+{{regen:end}}
+```
+
+Output:
+
+```html
+<blockquote>
+  <p>It is a truth universally acknowledged…</p>
+  <footer>— <cite>Jane Austen</cite>, <span class="blockquote__source">Pride and Prejudice</span></footer>
+</blockquote>
+```
+
+| Param | Effect |
+|---|---|
+| `author` | Creates `<cite>` in `<footer>` |
+| `source` | Creates `.blockquote__source` span in `<footer>` |
+
+Both `author` and `source` are optional. Omitting both suppresses the `<footer>` entirely.
+
+#### `element:heading`
+
+Produces `<h1>`–`<h6>` via `level` (default `h2`). `style` adds a display-scale class for oversized hero headings.
+
+```
+{{regen:start;element:heading;level:1;style:display1}}Page Title{{regen:end}}
+
+{{regen:start;element:heading;level:2}}Section Title{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `level` | `1`–`6` (default `2`) | Determines the tag (`h1`–`h6`) |
+| `style` | `display1`–`display6` | Adds `.heading--display{n}` for fluid display-scale sizing |
+| All others | any string | Set as HTML attribute |
+
+Display scale (fluid, matches `--font-size-display*` tokens):
+
+| `style` | Class | Min (632 px) | Max (1432 px) |
+|---|---|---|---|
+| `display1` | `.heading--display1` | 32 px | 52 px |
+| `display2` | `.heading--display2` | 30 px | 48 px |
+| `display3` | `.heading--display3` | 28 px | 44 px |
+| `display4` | `.heading--display4` | 26 px | 40 px |
+| `display5` | `.heading--display5` | 24 px | 36 px |
+| `display6` | `.heading--display6` | 22 px | 32 px |
+
+#### `element:badge`
+
+Produces an inline `<span class="badge">`. Follows the same `theme`/`style` pattern as `.btn`.
+
+```
+{{regen:start;element:badge;theme:success}}New{{regen:end}}
+
+{{regen:start;element:badge;theme:warning;style:outlined}}Beta{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Adds `.badge--{theme}` |
+| `style` | `solid` (default) · `outlined` | Adds `.badge--outlined` |
+| All others | any string | Set as HTML attribute |
+
+#### `element:alert`
+
+Produces a `<div class="alert">` with a coloured left border and subtle tinted background. Add `role:alert` for live-region announcements.
+
+```
+{{regen:start;element:alert;theme:warning;role:alert}}
+<p>Your session will expire in 5 minutes.</p>
+{{regen:end}}
+
+{{regen:start;element:alert;theme:success}}Changes saved.{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Sets border and background colour |
+| `role` | `alert` · `status` | Set as HTML attribute for ARIA live region |
+| All others | any string | Set as HTML attribute |
+
+#### `element:divider`
+
+Produces an `<hr>`. No content between the markers is required.
+
+```
+{{regen:start;element:divider}}{{regen:end}}
+```
+
+### Adding a new element type
+
+1. Add a new `else if (element === '<type>')` branch in `applyRegenDirective` in `scripts/config/global-decorators.js`.
+2. If the element uses special params that must not become HTML attributes, add those key names to `REGEN_CSS_KEYS`.
+3. Add supporting CSS to `styles/config/typography.css` (text/layout elements), `styles/config/buttons.css` (inline components), or `styles/config/globals.css` (block components).
+4. Document the new element in this section.
+
+---
+
 ## styles/styles.css
 
 Loaded in the `<head>` — part of the critical path. Keep it minimal. Only styles required before LCP belong here.

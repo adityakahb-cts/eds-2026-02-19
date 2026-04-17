@@ -158,8 +158,29 @@ tr:nth-child(even) td {
 }
 
 /* ── Prose lead / intro ── */
-.text-lead {
+.text-lead,
+.paragraph--intro {
   font-size: var(--font-size-intro);
   font-weight: 300;
   line-height: 1.5;
+}
+
+/* ── Heading display scale (regen element:heading style:display*) ── */
+.heading--display1 { font-size: var(--font-size-display1); }
+.heading--display2 { font-size: var(--font-size-display2); }
+.heading--display3 { font-size: var(--font-size-display3); }
+.heading--display4 { font-size: var(--font-size-display4); }
+.heading--display5 { font-size: var(--font-size-display5); }
+.heading--display6 { font-size: var(--font-size-display6); }
+
+/* ── Blockquote attribution (regen element:blockquote) ── */
+blockquote footer {
+  margin-block-start: var(--spacing-2);
+  font-size: var(--font-size-small);
+  font-style: normal;
+  color: var(--color-text-muted);
+}
+
+blockquote footer cite {
+  font-style: italic;
 }

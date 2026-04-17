@@ -11,7 +11,7 @@ import {
   loadSections,
   loadCSS,
 } from './aem.js';
-import { decorateIcons } from './config/global-decorators.js';
+import { decorateIcons, decorateRegenElements } from './config/global-decorators.js';
 
 /**
  * Encodes a plain-text string for safe use inside an HTML attribute value.
@@ -99,6 +99,7 @@ export function decorateMain(main) {
   // hopefully forward compatible button decoration
   decorateButtons(main);
   decorateIcons(main);
+  decorateRegenElements(main);
   buildAutoBlocks(main);
   decorateSections(main);
   decorateBlocks(main);
