@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Typography — EDS Design System</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <style>
+    .demo-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-sticky);
+    }
+    .demo-nav .container { display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap; }
+    .demo-nav strong { font-size: 1rem; margin-right: auto; }
+    .demo-nav a { font-size: 0.875rem; color: var(--color-link); text-decoration: none; }
+    .demo-nav a:hover { text-decoration: underline; }
+
+    .page-title { margin-top: var(--spacing-7); margin-bottom: var(--spacing-2); }
+    .page-sub { color: var(--color-text-secondary); margin-bottom: var(--spacing-7); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--spacing-2);
+    }
+
+    .type-row {
+      display: flex;
+      align-items: baseline;
+      gap: var(--spacing-5);
+      padding: var(--spacing-4) 0;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .type-meta {
+      min-width: 160px;
+      font-size: 0.75rem;
+      color: var(--color-text-secondary);
+      font-family: monospace;
+      flex-shrink: 0;
+    }
+    .type-meta strong { display: block; color: var(--color-text); font-family: inherit; }
+
+    .specimen-box {
+      background: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-m);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-5);
+    }
+    .specimen-box > * { margin: 0; }
+    .specimen-box > * + * { margin-top: var(--spacing-3); }
+
+    .link-row { display: flex; flex-wrap: wrap; gap: var(--spacing-5); align-items: baseline; padding: var(--spacing-4) 0; border-bottom: 1px solid var(--color-border); }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <div class="container">
+      <strong><a href="index.html" style="color:inherit;text-decoration:none;">EDS Design System</a></strong>
+      <a href="colors.html">Colors</a>
+      <a href="typography.html">Typography</a>
+      <a href="buttons.html">Buttons</a>
+      <a href="forms.html">Forms</a>
+      <a href="grid.html">Grid</a>
+      <a href="utilities.html">Utilities</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Typography</h1>
+      <p class="page-sub">Type scale, headings, body text, links, lists, code, blockquotes, and tables from <code>typography.css</code>.</p>
+
+      <!-- TYPE SCALE -->
+      <p class="section-label">Type Scale — Fluid clamp() values</p>
+
+      <div class="type-row">
+        <div class="type-meta"><strong>--font-size-xxl</strong>h1 default</div>
+        <h1 style="margin:0;">The quick brown fox</h1>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><strong>--font-size-xl</strong>h2 default</div>
+        <h2 style="margin:0;">The quick brown fox</h2>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><strong>--font-size-l</strong>h3 default</div>
+        <h3 style="margin:0;">The quick brown fox jumps</h3>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><strong>--font-size-m</strong>h4 default</div>
+        <h4 style="margin:0;">The quick brown fox jumps over</h4>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><strong>--font-size-s</strong>h5 default</div>
+        <h5 style="margin:0;">The quick brown fox jumps over the lazy dog</h5>
+      </div>
+      <div class="type-row">
+        <div class="type-meta"><strong>--font-size-xs</strong>h6 / body</div>
+        <h6 style="margin:0;">The quick brown fox jumps over the lazy dog</h6>
+      </div>
+
+      <!-- HEADINGS IN CONTEXT -->
+      <p class="section-label">Headings in Context</p>
+      <div class="specimen-box">
+        <h1>Heading Level 1</h1>
+        <h2>Heading Level 2</h2>
+        <h3>Heading Level 3</h3>
+        <h4>Heading Level 4</h4>
+        <h5>Heading Level 5</h5>
+        <h6>Heading Level 6</h6>
+      </div>
+
+      <!-- BODY TEXT -->
+      <p class="section-label">Body Text</p>
+      <div class="specimen-box">
+        <p class="text-lead">This is lead text — used for introductory paragraphs or summaries. It has slightly larger sizing and a lighter weight to draw the reader in before the main body text.</p>
+        <p>This is regular body text. Edge Delivery Services (EDS) is a modern, fast content delivery mechanism by Adobe that uses the underlying Franklin architecture. It is built on the principles of simplicity, performance, and developer-friendliness.</p>
+        <p>A second paragraph showing the default vertical rhythm. The quick brown fox jumps over the lazy dog. Sphinx of black quartz, judge my vow. Pack my box with five dozen liquor jugs.</p>
+        <p><small>Small text for captions, disclaimers, and fine print. The quick brown fox jumps over the lazy dog.</small></p>
+      </div>
+
+      <!-- LINKS -->
+      <p class="section-label">Links</p>
+      <div class="specimen-box">
+        <p>Inline <a href="#">default link</a> within a paragraph of text. Links have an underline to meet WCAG 1.4.1 (distinguishable from surrounding text without relying on color alone).</p>
+        <p><a href="#">Visited links</a> use a distinct visited color. <a href="#">Focus</a> is visible with a 2px outline ring.</p>
+      </div>
+
+      <!-- LISTS -->
+      <p class="section-label">Lists</p>
+      <div class="specimen-box">
+        <ul>
+          <li>Unordered list item one</li>
+          <li>Unordered list item two
+            <ul>
+              <li>Nested item A</li>
+              <li>Nested item B</li>
+            </ul>
+          </li>
+          <li>Unordered list item three</li>
+        </ul>
+
+        <ol>
+          <li>Ordered list item one</li>
+          <li>Ordered list item two
+            <ol>
+              <li>Nested item A</li>
+              <li>Nested item B</li>
+            </ol>
+          </li>
+          <li>Ordered list item three</li>
+        </ol>
+      </div>
+
+      <!-- CODE -->
+      <p class="section-label">Code &amp; Pre</p>
+      <div class="specimen-box">
+        <p>Inline code like <code>const greeting = 'hello';</code> and <code>npm run lint</code> renders in a monospace font with a tinted background.</p>
+
+        <pre><code>// Block-level preformatted code
+export default function decorate(block) {
+  const rows = [...block.children];
+  rows.forEach((row) =&gt; {
+    const [label, value] = [...row.children];
+    row.classList.add('block-row');
+    label.classList.add('block-label');
+    value.classList.add('block-value');
+  });
+}</code></pre>
+      </div>
+
+      <!-- BLOCKQUOTE -->
+      <p class="section-label">Blockquote</p>
+      <div class="specimen-box">
+        <blockquote>
+          "Performance is not a feature — it is a prerequisite. Every millisecond saved on the critical path is a millisecond closer to the user's goal."
+          <footer>— Edge Delivery Services philosophy</footer>
+        </blockquote>
+      </div>
+
+      <!-- HR -->
+      <p class="section-label">Horizontal Rule</p>
+      <div class="specimen-box">
+        <p>Content above the rule.</p>
+        <hr>
+        <p>Content below the rule.</p>
+      </div>
+
+      <!-- TABLE -->
+      <p class="section-label">Table</p>
+      <div class="specimen-box" style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Token</th>
+              <th>Value</th>
+              <th>Breakpoint</th>
+              <th>Usage</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>--breakpoint-sm</code></td>
+              <td>632px</td>
+              <td>Small</td>
+              <td>Phones landscape / small tablets</td>
+            </tr>
+            <tr>
+              <td><code>--breakpoint-md</code></td>
+              <td>760px</td>
+              <td>Medium</td>
+              <td>Tablets portrait</td>
+            </tr>
+            <tr>
+              <td><code>--breakpoint-lg</code></td>
+              <td>992px</td>
+              <td>Large</td>
+              <td>Tablets landscape / small desktops</td>
+            </tr>
+            <tr>
+              <td><code>--breakpoint-xl</code></td>
+              <td>1272px</td>
+              <td>Extra Large</td>
+              <td>Standard desktops</td>
+            </tr>
+            <tr>
+              <td><code>--breakpoint-xxl</code></td>
+              <td>1432px</td>
+              <td>2X Large</td>
+              <td>Wide desktops</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- FONT FAMILIES -->
+      <p class="section-label">Font Families</p>
+      <div class="specimen-box">
+        <p style="font-family:var(--font-family-body);font-size:1.25rem;">Body — Roboto: The quick brown fox jumps over the lazy dog. 0123456789</p>
+        <p style="font-family:var(--font-family-heading);font-size:1.25rem;font-weight:700;">Heading — Roboto Condensed Bold: THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG</p>
+        <p style="font-family:var(--font-family-mono);font-size:1rem;">Mono — system-ui: const fox = () =&gt; 'quick brown'; // 0123456789</p>
+      </div>
+
+      <div style="margin-bottom: var(--spacing-8);"></div>
+    </div>
+  </main>
+</body>
+</html>

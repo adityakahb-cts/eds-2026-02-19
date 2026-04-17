@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forms — EDS Design System</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <style>
+    .demo-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-sticky);
+    }
+    .demo-nav .container { display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap; }
+    .demo-nav strong { font-size: 1rem; margin-right: auto; }
+    .demo-nav a { font-size: 0.875rem; color: var(--color-link); text-decoration: none; }
+    .demo-nav a:hover { text-decoration: underline; }
+
+    .page-title { margin-top: var(--spacing-7); margin-bottom: var(--spacing-2); }
+    .page-sub { color: var(--color-text-secondary); margin-bottom: var(--spacing-7); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--spacing-2);
+    }
+
+    .demo-box {
+      background: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-m);
+      padding: var(--spacing-6);
+      margin-bottom: var(--spacing-5);
+    }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-4); }
+    @media (width < 632px) { .two-col { grid-template-columns: 1fr; } }
+    .three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--spacing-4); }
+    @media (width < 760px) { .three-col { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <div class="container">
+      <strong><a href="index.html" style="color:inherit;text-decoration:none;">EDS Design System</a></strong>
+      <a href="colors.html">Colors</a>
+      <a href="typography.html">Typography</a>
+      <a href="buttons.html">Buttons</a>
+      <a href="forms.html">Forms</a>
+      <a href="grid.html">Grid</a>
+      <a href="utilities.html">Utilities</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Forms</h1>
+      <p class="page-sub">All form controls from <code>forms.css</code> — text inputs, textarea, select, checkboxes, radios, validation states, fieldsets, and range sliders.</p>
+
+      <!-- TEXT INPUTS -->
+      <p class="section-label">Text Inputs</p>
+      <div class="demo-box">
+        <div class="two-col">
+          <div class="form-group">
+            <label for="input-text">Text Input</label>
+            <input type="text" id="input-text" placeholder="Enter some text…">
+          </div>
+          <div class="form-group">
+            <label for="input-email">Email</label>
+            <input type="email" id="input-email" placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label for="input-password">Password</label>
+            <input type="password" id="input-password" placeholder="••••••••">
+          </div>
+          <div class="form-group">
+            <label for="input-number">Number</label>
+            <input type="number" id="input-number" placeholder="42" min="0" max="100">
+          </div>
+          <div class="form-group">
+            <label for="input-tel">Phone</label>
+            <input type="tel" id="input-tel" placeholder="+1 555 000 0000">
+          </div>
+          <div class="form-group">
+            <label for="input-url">URL</label>
+            <input type="url" id="input-url" placeholder="https://example.com">
+          </div>
+          <div class="form-group">
+            <label for="input-date">Date</label>
+            <input type="date" id="input-date">
+          </div>
+          <div class="form-group">
+            <label for="input-search">Search</label>
+            <input type="search" id="input-search" placeholder="Search…">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-top:var(--spacing-4);">
+          <label for="input-disabled">Disabled Input</label>
+          <input type="text" id="input-disabled" placeholder="Disabled input" disabled>
+          <span class="form-text">This field is disabled and cannot be edited.</span>
+        </div>
+
+        <div class="form-group" style="margin-top:var(--spacing-4);">
+          <label for="input-readonly">Read-only Input</label>
+          <input type="text" id="input-readonly" value="This value is read-only" readonly>
+        </div>
+      </div>
+
+      <!-- TEXTAREA -->
+      <p class="section-label">Textarea</p>
+      <div class="demo-box">
+        <div class="form-group">
+          <label for="textarea-default">Message</label>
+          <textarea id="textarea-default" rows="4" placeholder="Type your message here…"></textarea>
+          <span class="form-text">Max 500 characters. Resize handle is vertical-only.</span>
+        </div>
+      </div>
+
+      <!-- SELECT -->
+      <p class="section-label">Select</p>
+      <div class="demo-box">
+        <div class="two-col">
+          <div class="form-group">
+            <label for="select-default">Country</label>
+            <select id="select-default">
+              <option value="">Choose a country…</option>
+              <option value="us">United States</option>
+              <option value="gb">United Kingdom</option>
+              <option value="ca">Canada</option>
+              <option value="au">Australia</option>
+              <option value="de">Germany</option>
+              <option value="fr">France</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="select-disabled">Disabled Select</label>
+            <select id="select-disabled" disabled>
+              <option>Cannot be changed</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:var(--spacing-4);">
+          <label for="select-multiple">Multi-select</label>
+          <select id="select-multiple" multiple size="4">
+            <option>Option Alpha</option>
+            <option>Option Beta</option>
+            <option>Option Gamma</option>
+            <option>Option Delta</option>
+            <option>Option Epsilon</option>
+          </select>
+          <span class="form-text">Hold Ctrl / Cmd to select multiple.</span>
+        </div>
+      </div>
+
+      <!-- CHECKBOXES & RADIOS -->
+      <p class="section-label">Checkboxes &amp; Radios</p>
+      <div class="demo-box">
+        <div class="two-col">
+          <div>
+            <p style="margin-bottom:var(--spacing-3);font-weight:600;">Checkboxes</p>
+            <div class="form-group">
+              <label><input type="checkbox" checked> Subscribe to newsletter</label>
+            </div>
+            <div class="form-group">
+              <label><input type="checkbox"> Receive SMS updates</label>
+            </div>
+            <div class="form-group">
+              <label><input type="checkbox" disabled> Disabled checkbox</label>
+            </div>
+            <div class="form-group">
+              <label><input type="checkbox" checked disabled> Disabled checked</label>
+            </div>
+          </div>
+          <div>
+            <p style="margin-bottom:var(--spacing-3);font-weight:600;">Radio Buttons</p>
+            <div class="form-group">
+              <label><input type="radio" name="plan" value="free" checked> Free plan</label>
+            </div>
+            <div class="form-group">
+              <label><input type="radio" name="plan" value="pro"> Pro plan</label>
+            </div>
+            <div class="form-group">
+              <label><input type="radio" name="plan" value="enterprise"> Enterprise plan</label>
+            </div>
+            <div class="form-group">
+              <label><input type="radio" name="plan" value="disabled" disabled> Unavailable plan</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VALIDATION STATES -->
+      <p class="section-label">Validation States</p>
+      <div class="demo-box">
+        <div class="three-col">
+          <div class="form-group">
+            <label for="input-valid">Valid Input</label>
+            <input type="email" id="input-valid" value="user@example.com" class="is-valid">
+            <div class="valid-feedback">Looks good! Valid email address.</div>
+          </div>
+          <div class="form-group">
+            <label for="input-invalid">Invalid Input</label>
+            <input type="email" id="input-invalid" value="not-an-email" class="is-invalid">
+            <div class="invalid-feedback">Please enter a valid email address.</div>
+          </div>
+          <div class="form-group">
+            <label for="input-warning-field">With Helper Text</label>
+            <input type="text" id="input-warning-field" placeholder="Enter value…">
+            <span class="form-text">Must be at least 8 characters long.</span>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top:var(--spacing-4);">
+          <div class="form-group">
+            <label for="select-valid">Valid Select</label>
+            <select id="select-valid" class="is-valid">
+              <option selected>Option selected</option>
+            </select>
+            <div class="valid-feedback">Good choice!</div>
+          </div>
+          <div class="form-group">
+            <label for="select-invalid">Invalid Select</label>
+            <select id="select-invalid" class="is-invalid">
+              <option selected>Please select one…</option>
+            </select>
+            <div class="invalid-feedback">Please select a valid option.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FIELDSET / LEGEND -->
+      <p class="section-label">Fieldset &amp; Legend</p>
+      <div class="demo-box">
+        <fieldset>
+          <legend>Shipping Address</legend>
+          <div class="two-col">
+            <div class="form-group">
+              <label for="field-first">First Name</label>
+              <input type="text" id="field-first" placeholder="Jane">
+            </div>
+            <div class="form-group">
+              <label for="field-last">Last Name</label>
+              <input type="text" id="field-last" placeholder="Doe">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="field-street">Street Address</label>
+            <input type="text" id="field-street" placeholder="123 Main St">
+          </div>
+          <div class="two-col">
+            <div class="form-group">
+              <label for="field-city">City</label>
+              <input type="text" id="field-city" placeholder="Springfield">
+            </div>
+            <div class="form-group">
+              <label for="field-zip">ZIP Code</label>
+              <input type="text" id="field-zip" placeholder="12345">
+            </div>
+          </div>
+        </fieldset>
+      </div>
+
+      <!-- RANGE -->
+      <p class="section-label">Range Slider</p>
+      <div class="demo-box">
+        <div class="form-group">
+          <label for="range-volume">Volume</label>
+          <input type="range" id="range-volume" min="0" max="100" value="60">
+          <span class="form-text">Adjust the playback volume.</span>
+        </div>
+        <div class="form-group">
+          <label for="range-disabled">Disabled Range</label>
+          <input type="range" id="range-disabled" min="0" max="100" value="30" disabled>
+        </div>
+      </div>
+
+      <!-- FULL FORM EXAMPLE -->
+      <p class="section-label">Full Form Example</p>
+      <div class="demo-box">
+        <form novalidate>
+          <h3 style="margin-top:0;">Create Account</h3>
+          <div class="two-col">
+            <div class="form-group">
+              <label for="ex-first">First Name <span aria-hidden="true">*</span></label>
+              <input type="text" id="ex-first" required placeholder="Jane">
+            </div>
+            <div class="form-group">
+              <label for="ex-last">Last Name <span aria-hidden="true">*</span></label>
+              <input type="text" id="ex-last" required placeholder="Doe">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="ex-email">Email <span aria-hidden="true">*</span></label>
+            <input type="email" id="ex-email" required placeholder="jane@example.com">
+          </div>
+          <div class="form-group">
+            <label for="ex-password">Password <span aria-hidden="true">*</span></label>
+            <input type="password" id="ex-password" required placeholder="Min 8 characters">
+            <span class="form-text">Use uppercase, lowercase, numbers, and symbols.</span>
+          </div>
+          <div class="form-group">
+            <label for="ex-role">Role</label>
+            <select id="ex-role">
+              <option value="">Select role…</option>
+              <option>Developer</option>
+              <option>Designer</option>
+              <option>Content Author</option>
+              <option>Project Manager</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="ex-bio">Bio</label>
+            <textarea id="ex-bio" rows="3" placeholder="Tell us a bit about yourself…"></textarea>
+          </div>
+          <div class="form-group">
+            <label><input type="checkbox" required> I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+          </div>
+          <div style="display:flex;gap:var(--spacing-3);margin-top:var(--spacing-4);">
+            <button type="submit" class="btn btn--primary">Create Account</button>
+            <button type="reset" class="btn btn--secondary btn--outlined">Reset</button>
+          </div>
+        </form>
+      </div>
+
+      <div style="margin-bottom: var(--spacing-8);"></div>
+    </div>
+  </main>
+</body>
+</html>

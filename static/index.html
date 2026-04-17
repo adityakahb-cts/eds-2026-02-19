@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EDS Design System — Demo Index</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <style>
+    .demo-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-sticky);
+    }
+    .demo-nav .container { display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap; }
+    .demo-nav strong { font-size: 1rem; margin-right: auto; }
+    .demo-nav a { font-size: 0.875rem; color: var(--color-link); text-decoration: none; }
+    .demo-nav a:hover { text-decoration: underline; }
+
+    .hero {
+      background: var(--color-primary);
+      color: var(--color-primary-text);
+      padding: var(--spacing-8) 0;
+      text-align: center;
+    }
+    .hero h1 { color: inherit; margin: 0 0 var(--spacing-2); }
+    .hero p { margin: 0; opacity: 0.85; font-size: 1.125rem; }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: var(--spacing-5);
+      margin-top: var(--spacing-6);
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-m);
+      overflow: hidden;
+      transition: box-shadow var(--transition);
+      background: var(--color-surface);
+    }
+    .card:hover { box-shadow: var(--shadow-medium); }
+    .card-thumb {
+      aspect-ratio: 16/7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      background: var(--color-primary-subtle);
+    }
+    .card-body { padding: var(--spacing-4); flex: 1; }
+    .card-body h2 { font-size: 1.125rem; margin: 0 0 var(--spacing-2); }
+    .card-body p { font-size: 0.875rem; color: var(--color-text-secondary); margin: 0 0 var(--spacing-4); }
+    .card-body a { font-size: 0.875rem; }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+    }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <div class="container">
+      <strong>EDS Design System</strong>
+      <a href="colors.html">Colors</a>
+      <a href="typography.html">Typography</a>
+      <a href="buttons.html">Buttons</a>
+      <a href="forms.html">Forms</a>
+      <a href="grid.html">Grid</a>
+      <a href="utilities.html">Utilities</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="container">
+      <h1>EDS Design System</h1>
+      <p>Component and style demos for every CSS file in <code style="background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:4px;">styles/config/</code></p>
+    </div>
+  </div>
+
+  <main>
+    <div class="container">
+      <p class="section-label">All Demos</p>
+
+      <div class="card-grid">
+        <div class="card">
+          <div class="card-thumb" style="background:var(--color-primary-subtle);">🎨</div>
+          <div class="card-body">
+            <h2>Colors</h2>
+            <p>Full raw palette (neutral, blue, violet, teal, red, green, sky, amber) and semantic token swatches for light and dark mode.</p>
+            <a href="colors.html">View demo →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-thumb" style="background:var(--color-secondary-subtle);">Aa</div>
+          <div class="card-body">
+            <h2>Typography</h2>
+            <p>Headings h1–h6, body text, links, lists, blockquotes, code, pre, tables, and the fluid type scale.</p>
+            <a href="typography.html">View demo →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-thumb" style="background:var(--color-tertiary-subtle);">⬛</div>
+          <div class="card-body">
+            <h2>Buttons</h2>
+            <p>All button variants: semantic colors, sizes, outlined, pilled, icon placements, and button groups.</p>
+            <a href="buttons.html">View demo →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-thumb" style="background:var(--color-info-subtle);">⌨️</div>
+          <div class="card-body">
+            <h2>Forms</h2>
+            <p>Text inputs, textareas, selects, checkboxes, radios, validation states, fieldsets, and range sliders.</p>
+            <a href="forms.html">View demo →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-thumb" style="background:var(--color-success-subtle);">▦</div>
+          <div class="card-body">
+            <h2>Grid</h2>
+            <p>12-column flex grid, container variants, CSS Grid classes, column offsets, and responsive breakpoints.</p>
+            <a href="grid.html">View demo →</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-thumb" style="background:var(--color-warning-subtle);">🔧</div>
+          <div class="card-body">
+            <h2>Utilities</h2>
+            <p>Display, flex, spacing, text, position, visibility, borders, shadows, and keyframe animations.</p>
+            <a href="utilities.html">View demo →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

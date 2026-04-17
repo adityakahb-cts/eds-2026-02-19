@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Utilities — EDS Design System</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <style>
+    .demo-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-sticky);
+    }
+    .demo-nav .container { display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap; }
+    .demo-nav strong { font-size: 1rem; margin-right: auto; }
+    .demo-nav a { font-size: 0.875rem; color: var(--color-link); text-decoration: none; }
+    .demo-nav a:hover { text-decoration: underline; }
+
+    .page-title { margin-top: var(--spacing-7); margin-bottom: var(--spacing-2); }
+    .page-sub { color: var(--color-text-secondary); margin-bottom: var(--spacing-7); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--spacing-2);
+    }
+
+    .demo-box {
+      background: var(--color-surface-raised);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-m);
+      padding: var(--spacing-5);
+      margin-bottom: var(--spacing-5);
+    }
+
+    /* Demo helpers */
+    .box {
+      background: var(--color-primary-subtle);
+      border: 1px solid var(--color-primary-border);
+      border-radius: var(--border-radius-s);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-primary);
+    }
+
+    .util-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--spacing-3);
+      align-items: flex-start;
+      margin-bottom: var(--spacing-4);
+    }
+
+    .util-tag {
+      display: inline-block;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--border-radius-s);
+      padding: var(--spacing-1) var(--spacing-2);
+      font-size: 0.7rem;
+      font-family: monospace;
+      color: var(--color-text-secondary);
+      margin-bottom: var(--spacing-2);
+    }
+
+    /* Spacing scale preview */
+    .spacing-row { display: flex; flex-direction: column; gap: var(--spacing-2); }
+    .spacing-item { display: flex; align-items: center; gap: var(--spacing-3); }
+    .spacing-bar { background: var(--color-primary); height: 20px; border-radius: 3px; }
+    .spacing-label { font-size: 0.75rem; font-family: monospace; min-width: 120px; color: var(--color-text-secondary); }
+
+    /* Animation demos */
+    .anim-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: var(--spacing-4);
+    }
+    .anim-box {
+      background: var(--color-primary-subtle);
+      border: 1px solid var(--color-primary-border);
+      border-radius: var(--border-radius-m);
+      padding: var(--spacing-4);
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    /* shadow demos */
+    .shadow-demo { display: flex; gap: var(--spacing-5); flex-wrap: wrap; }
+    .shadow-box {
+      width: 100px;
+      height: 60px;
+      border-radius: var(--border-radius-m);
+      background: var(--color-surface-raised);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <div class="container">
+      <strong><a href="index.html" style="color:inherit;text-decoration:none;">EDS Design System</a></strong>
+      <a href="colors.html">Colors</a>
+      <a href="typography.html">Typography</a>
+      <a href="buttons.html">Buttons</a>
+      <a href="forms.html">Forms</a>
+      <a href="grid.html">Grid</a>
+      <a href="utilities.html">Utilities</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Utilities</h1>
+      <p class="page-sub">Display, flex, spacing, text, position, visibility, borders, shadows, and animations from <code>utilities.css</code>.</p>
+
+      <!-- SPACING SCALE -->
+      <p class="section-label">Spacing Scale Tokens</p>
+      <div class="demo-box">
+        <div class="spacing-row">
+          <div class="spacing-item"><div class="spacing-label">--spacing-1 (0.25rem)</div><div class="spacing-bar" style="width:var(--spacing-1);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">4px</span></div>
+          <div class="spacing-item"><div class="spacing-label">--spacing-2 (0.5rem)</div><div class="spacing-bar" style="width:calc(var(--spacing-2)*4);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">8px</span></div>
+          <div class="spacing-item"><div class="spacing-label">--spacing-3 (0.75rem)</div><div class="spacing-bar" style="width:calc(var(--spacing-3)*4);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">12px</span></div>
+          <div class="spacing-item"><div class="spacing-label">--spacing-4 (1rem)</div><div class="spacing-bar" style="width:calc(var(--spacing-4)*4);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">16px</span></div>
+          <div class="spacing-item"><div class="spacing-label">--spacing-5 (1.5rem)</div><div class="spacing-bar" style="width:calc(var(--spacing-5)*4);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">24px</span></div>
+          <div class="spacing-item"><div class="spacing-label">--spacing-6 (2rem)</div><div class="spacing-bar" style="width:calc(var(--spacing-6)*4);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">32px</span></div>
+          <div class="spacing-item"><div class="spacing-label">--spacing-7 (2.5rem)</div><div class="spacing-bar" style="width:calc(var(--spacing-7)*4);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">40px</span></div>
+          <div class="spacing-item"><div class="spacing-label">--spacing-8 (3rem)</div><div class="spacing-bar" style="width:calc(var(--spacing-8)*4);"></div><span style="font-size:0.7rem;color:var(--color-text-secondary);">48px</span></div>
+        </div>
+      </div>
+
+      <!-- DISPLAY -->
+      <p class="section-label">Display Utilities</p>
+      <div class="demo-box">
+        <div class="util-row">
+          <div><div class="util-tag">.d-none</div><div class="box d-none" style="width:80px;height:40px;">.d-none</div><p style="font-size:0.75rem;color:var(--color-text-secondary);margin:0;">Hidden (not rendered)</p></div>
+          <div><div class="util-tag">.d-block</div><div class="box d-block" style="width:80px;height:40px;">block</div></div>
+          <div><div class="util-tag">.d-inline</div><span class="box d-inline" style="padding:8px;">inline</span></div>
+          <div><div class="util-tag">.d-inline-block</div><div class="box d-inline-block" style="width:80px;height:40px;">i-block</div></div>
+          <div><div class="util-tag">.d-flex</div><div class="d-flex gap-2"><div class="box" style="width:32px;height:32px;">A</div><div class="box" style="width:32px;height:32px;">B</div><div class="box" style="width:32px;height:32px;">C</div></div></div>
+        </div>
+      </div>
+
+      <!-- FLEXBOX -->
+      <p class="section-label">Flexbox Utilities</p>
+      <div class="demo-box">
+        <p style="font-size:0.8rem;font-weight:600;margin-bottom:var(--spacing-2);">justify-content</p>
+        <div class="util-row" style="flex-direction:column;gap:var(--spacing-2);">
+          <div>
+            <div class="util-tag">.justify-content-start</div>
+            <div class="d-flex justify-content-start" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;height:32px;">A</div><div class="box" style="width:40px;height:32px;">B</div><div class="box" style="width:40px;height:32px;">C</div>
+            </div>
+          </div>
+          <div>
+            <div class="util-tag">.justify-content-center</div>
+            <div class="d-flex justify-content-center" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;height:32px;">A</div><div class="box" style="width:40px;height:32px;">B</div><div class="box" style="width:40px;height:32px;">C</div>
+            </div>
+          </div>
+          <div>
+            <div class="util-tag">.justify-content-end</div>
+            <div class="d-flex justify-content-end" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;height:32px;">A</div><div class="box" style="width:40px;height:32px;">B</div><div class="box" style="width:40px;height:32px;">C</div>
+            </div>
+          </div>
+          <div>
+            <div class="util-tag">.justify-content-between</div>
+            <div class="d-flex justify-content-between" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;height:32px;">A</div><div class="box" style="width:40px;height:32px;">B</div><div class="box" style="width:40px;height:32px;">C</div>
+            </div>
+          </div>
+          <div>
+            <div class="util-tag">.justify-content-around</div>
+            <div class="d-flex justify-content-around" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;">
+              <div class="box" style="width:40px;height:32px;">A</div><div class="box" style="width:40px;height:32px;">B</div><div class="box" style="width:40px;height:32px;">C</div>
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:0.8rem;font-weight:600;margin:var(--spacing-4) 0 var(--spacing-2);">align-items</p>
+        <div class="util-row" style="gap:var(--spacing-3);">
+          <div>
+            <div class="util-tag">.align-items-start</div>
+            <div class="d-flex align-items-start" style="height:80px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;height:20px;">A</div><div class="box" style="width:40px;height:40px;">B</div><div class="box" style="width:40px;height:30px;">C</div>
+            </div>
+          </div>
+          <div>
+            <div class="util-tag">.align-items-center</div>
+            <div class="d-flex align-items-center" style="height:80px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;height:20px;">A</div><div class="box" style="width:40px;height:40px;">B</div><div class="box" style="width:40px;height:30px;">C</div>
+            </div>
+          </div>
+          <div>
+            <div class="util-tag">.align-items-end</div>
+            <div class="d-flex align-items-end" style="height:80px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;height:20px;">A</div><div class="box" style="width:40px;height:40px;">B</div><div class="box" style="width:40px;height:30px;">C</div>
+            </div>
+          </div>
+          <div>
+            <div class="util-tag">.align-items-stretch</div>
+            <div class="d-flex align-items-stretch" style="height:80px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:4px;padding:4px;gap:4px;">
+              <div class="box" style="width:40px;">A</div><div class="box" style="width:40px;">B</div><div class="box" style="width:40px;">C</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TEXT UTILITIES -->
+      <p class="section-label">Text Utilities</p>
+      <div class="demo-box">
+        <div class="util-row" style="flex-direction:column;gap:var(--spacing-3);">
+          <p class="text-start m-0"><span class="util-tag">.text-start</span> Left-aligned text. The quick brown fox jumps over the lazy dog.</p>
+          <p class="text-center m-0"><span class="util-tag">.text-center</span> Center-aligned text. The quick brown fox jumps over the lazy dog.</p>
+          <p class="text-end m-0"><span class="util-tag">.text-end</span> Right-aligned text. The quick brown fox jumps over the lazy dog.</p>
+          <p class="text-uppercase m-0"><span class="util-tag">.text-uppercase</span> uppercase text.</p>
+          <p class="text-lowercase m-0"><span class="util-tag">.text-lowercase</span> LOWERCASE TEXT.</p>
+          <p class="text-capitalize m-0"><span class="util-tag">.text-capitalize</span> capitalized text.</p>
+          <p class="fw-bold m-0"><span class="util-tag">.fw-bold</span> Bold text.</p>
+          <p class="fw-normal m-0"><span class="util-tag">.fw-normal</span> Normal weight text.</p>
+          <p class="fst-italic m-0"><span class="util-tag">.fst-italic</span> Italic text.</p>
+          <p class="text-truncate m-0" style="max-width:300px;"><span class="util-tag">.text-truncate</span> This very long text will be truncated with an ellipsis when it overflows its container width.</p>
+        </div>
+      </div>
+
+      <!-- VISIBILITY -->
+      <p class="section-label">Visibility Utilities</p>
+      <div class="demo-box">
+        <div class="util-row">
+          <div>
+            <div class="util-tag">.visible</div>
+            <div class="box visible" style="width:80px;height:48px;">visible</div>
+          </div>
+          <div>
+            <div class="util-tag">.invisible</div>
+            <div class="box invisible" style="width:80px;height:48px;">invisible</div>
+            <p style="font-size:0.7rem;color:var(--color-text-secondary);margin:0;">(space preserved)</p>
+          </div>
+          <div>
+            <div class="util-tag">.visually-hidden</div>
+            <div class="box visually-hidden">visually hidden</div>
+            <p style="font-size:0.7rem;color:var(--color-text-secondary);margin:0;">Hidden from view,<br>visible to screen readers</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BORDERS -->
+      <p class="section-label">Border Utilities</p>
+      <div class="demo-box">
+        <div class="util-row">
+          <div><div class="util-tag">.border</div><div class="box border" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.border-top</div><div class="box border-top" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.border-bottom</div><div class="box border-bottom" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.border-start</div><div class="box border-start" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.border-end</div><div class="box border-end" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.border-0</div><div class="box border border-0" style="width:64px;height:48px;">no bdr</div></div>
+        </div>
+
+        <p style="font-size:0.8rem;font-weight:600;margin:var(--spacing-4) 0 var(--spacing-2);">Border Radius</p>
+        <div class="util-row">
+          <div><div class="util-tag">.rounded-0</div><div class="box border rounded-0" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.rounded-sm</div><div class="box border rounded-sm" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.rounded</div><div class="box border rounded" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.rounded-lg</div><div class="box border rounded-lg" style="width:64px;height:48px;"></div></div>
+          <div><div class="util-tag">.rounded-pill</div><div class="box border rounded-pill" style="width:80px;height:48px;">pill</div></div>
+          <div><div class="util-tag">.rounded-circle</div><div class="box border rounded-circle" style="width:48px;height:48px;"></div></div>
+        </div>
+      </div>
+
+      <!-- SHADOWS -->
+      <p class="section-label">Shadow Utilities</p>
+      <div class="demo-box">
+        <div class="shadow-demo">
+          <div><div class="util-tag">.shadow-none</div><div class="shadow-box shadow-none">none</div></div>
+          <div><div class="util-tag">.shadow-sm</div><div class="shadow-box shadow-sm">small</div></div>
+          <div><div class="util-tag">.shadow</div><div class="shadow-box shadow">medium</div></div>
+          <div><div class="util-tag">.shadow-lg</div><div class="shadow-box shadow-lg">large</div></div>
+        </div>
+      </div>
+
+      <!-- BACKGROUND -->
+      <p class="section-label">Background Utilities</p>
+      <div class="demo-box">
+        <div class="util-row">
+          <div>
+            <div class="util-tag">.surface</div>
+            <div class="surface border rounded" style="padding:var(--spacing-3) var(--spacing-4);font-size:0.8rem;">.surface</div>
+          </div>
+          <div>
+            <div class="util-tag">.bordered</div>
+            <div class="bordered rounded" style="padding:var(--spacing-3) var(--spacing-4);font-size:0.8rem;">.bordered</div>
+          </div>
+          <div>
+            <div class="util-tag">.bg-transparent</div>
+            <div class="bg-transparent border rounded" style="padding:var(--spacing-3) var(--spacing-4);font-size:0.8rem;">.bg-transparent</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ANIMATIONS -->
+      <p class="section-label">Keyframe Animations — click to replay</p>
+      <div class="demo-box">
+        <p style="font-size:0.875rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-4);">Click any box to re-trigger its animation. All animations respect <code>prefers-reduced-motion</code>.</p>
+        <div class="anim-grid" id="anim-grid">
+          <div class="anim-box animate animate--fade-in">fade-in</div>
+          <div class="anim-box animate animate--slide-up">slide-up</div>
+          <div class="anim-box animate animate--slide-down">slide-down</div>
+          <div class="anim-box animate animate--slide-in-left">slide-in-left</div>
+          <div class="anim-box animate animate--slide-in-right">slide-in-right</div>
+          <div class="anim-box animate animate--scale-in">scale-in</div>
+          <div class="anim-box animate animate--spin animate--infinite">spin</div>
+          <div class="anim-box animate animate--pulse animate--infinite">pulse</div>
+          <div class="anim-box animate animate--bounce animate--infinite">bounce</div>
+        </div>
+
+        <p style="font-size:0.8rem;font-weight:600;margin:var(--spacing-5) 0 var(--spacing-2);">Speed Modifiers</p>
+        <div class="util-row">
+          <div>
+            <div class="util-tag">.animate--fast</div>
+            <div class="anim-box animate animate--spin animate--infinite animate--fast" style="width:80px;height:48px;">fast</div>
+          </div>
+          <div>
+            <div class="util-tag">.animate (default)</div>
+            <div class="anim-box animate animate--spin animate--infinite" style="width:80px;height:48px;">normal</div>
+          </div>
+          <div>
+            <div class="util-tag">.animate--slow</div>
+            <div class="anim-box animate animate--spin animate--infinite animate--slow" style="width:80px;height:48px;">slow</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SPACING MARGIN/PADDING DEMO -->
+      <p class="section-label">Margin &amp; Padding Scale — <code style="font-size:0.75rem;">.m-{0-5}</code> / <code style="font-size:0.75rem;">.p-{0-5}</code></p>
+      <div class="demo-box">
+        <div class="d-flex flex-wrap gap-3 align-items-center">
+          <div><div class="util-tag">.p-0</div><div class="box border p-0" style="width:64px;font-size:0.7rem;">p-0</div></div>
+          <div><div class="util-tag">.p-1</div><div class="box border p-1" style="font-size:0.7rem;">p-1</div></div>
+          <div><div class="util-tag">.p-2</div><div class="box border p-2" style="font-size:0.7rem;">p-2</div></div>
+          <div><div class="util-tag">.p-3</div><div class="box border p-3" style="font-size:0.7rem;">p-3</div></div>
+          <div><div class="util-tag">.p-4</div><div class="box border p-4" style="font-size:0.7rem;">p-4</div></div>
+          <div><div class="util-tag">.p-5</div><div class="box border p-5" style="font-size:0.7rem;">p-5</div></div>
+        </div>
+        <div class="d-flex flex-wrap gap-3 align-items-center" style="margin-top:var(--spacing-4);">
+          <div><div class="util-tag">.m-0</div><div class="box border m-0" style="width:64px;font-size:0.7rem;">m-0</div></div>
+          <div><div class="util-tag">.mx-auto</div><div class="box border mx-auto" style="width:64px;font-size:0.7rem;">mx-auto</div></div>
+          <div><div class="util-tag">.ms-auto</div><div class="d-flex" style="border:1px dashed var(--color-border);border-radius:4px;width:100%;"><div class="box border ms-auto" style="width:64px;font-size:0.7rem;">ms-auto</div></div></div>
+          <div><div class="util-tag">.me-auto</div><div class="d-flex" style="border:1px dashed var(--color-border);border-radius:4px;width:100%;"><div class="box border me-auto" style="width:64px;font-size:0.7rem;">me-auto</div></div></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: var(--spacing-8);"></div>
+    </div>
+  </main>
+
+  <script>
+    // Re-trigger animations on click
+    document.getElementById('anim-grid').addEventListener('click', (e) => {
+      const box = e.target.closest('.anim-box');
+      if (!box) return;
+      box.style.animation = 'none';
+      box.offsetHeight; // reflow
+      box.style.animation = '';
+    });
+  </script>
+</body>
+</html>

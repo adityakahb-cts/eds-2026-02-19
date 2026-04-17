@@ -122,62 +122,480 @@ Do not load fonts anywhere else. The `localhost` guard prevents sessionStorage f
 
 ---
 
+## Regen Directives (`scripts/config/global-decorators.js`)
+
+Regen directives let authors embed declarative markup instructions directly in page content. `decorateRegenElements(main)` — called from `decorateMain` — finds every `{{regen:start;...}} … {{regen:end}}` pair and replaces the enclosed content with the specified element.
+
+### Syntax
+
+```
+{{regen:start;element:<type>;<key>:<value>;…}}
+  [authored content between markers]
+{{regen:end}}
+```
+
+**CSS keys** (`element`, `theme`, `style`, `size`, `level`, `author`, `source`) drive class/tag logic and are never set as HTML attributes. All other keys are applied as HTML attributes verbatim (`href`, `alt`, `width`, `target`, `aria-label`, etc.).
+
+### Supported elements
+
+#### `element:anchor`
+
+Enhances an existing `<a>` in place, or creates a new one if none is found. Receives the full `.btn` class system.
+
+```
+{{regen:start;element:anchor;theme:primary;style:solid;size:large;target:blank;title:"Go"}}
+Link Text
+{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Adds `.btn--{theme}` |
+| `style` | `solid` (default, no class) · `outlined` | Adds `.btn--outlined` |
+| `size` | `small`/`sm` · `medium`/`md` (default) · `large`/`lg` · `extra-large`/`xl` | Adds `.btn--{size}` |
+| All others | any string | Set as HTML attribute |
+
+#### `element:button`
+
+Always produces a `<button type="button">`. Same `theme`/`style`/`size` class system as `anchor`.
+
+```
+{{regen:start;element:button;theme:danger;style:outlined;aria-label:"Remove item"}}
+Delete
+{{regen:end}}
+```
+
+#### `element:image`
+
+Produces an `<img>`. Place an `<a>` between the markers — its `href` becomes the `img src`. If the anchor has a `target` the image is wrapped in a link.
+
+```
+{{regen:start;element:image;alt:"Hero image";width:1200;height:600;loading:lazy}}
+<a href="/media/hero.jpg" target="_blank">Hero</a>
+{{regen:end}}
+```
+
+| Param | Effect |
+|---|---|
+| `alt`, `width`, `height`, `loading`, … | Set as `<img>` attributes |
+| Anchor `href` | Becomes `img.src` (and `a.href` when target is present) |
+| Anchor `target` | Wraps the image in `<a href target>` |
+
+#### `element:paragraph`
+
+Produces a `<p>`. `style` generates a BEM modifier class.
+
+```
+{{regen:start;element:paragraph;style:intro}}
+Introductory copy that renders larger than body text.
+{{regen:end}}
+```
+
+| `style` value | Class added | Visual result |
+|---|---|---|
+| `intro` | `.paragraph--intro` | `--font-size-intro`, weight 300, line-height 1.5 |
+| *(absent)* | — | Default `<p>` styling |
+
+#### `element:blockquote`
+
+Produces a `<blockquote>`. `author` and `source` generate a `<footer>` with `<cite>` and `.blockquote__source`.
+
+```
+{{regen:start;element:blockquote;author:"Jane Austen";source:"Pride and Prejudice"}}
+<p>It is a truth universally acknowledged…</p>
+{{regen:end}}
+```
+
+Output:
+
+```html
+<blockquote>
+  <p>It is a truth universally acknowledged…</p>
+  <footer>— <cite>Jane Austen</cite>, <span class="blockquote__source">Pride and Prejudice</span></footer>
+</blockquote>
+```
+
+| Param | Effect |
+|---|---|
+| `author` | Creates `<cite>` in `<footer>` |
+| `source` | Creates `.blockquote__source` span in `<footer>` |
+
+Both `author` and `source` are optional. Omitting both suppresses the `<footer>` entirely.
+
+#### `element:heading`
+
+Produces `<h1>`–`<h6>` via `level` (default `h2`). `style` adds a display-scale class for oversized hero headings.
+
+```
+{{regen:start;element:heading;level:1;style:display1}}Page Title{{regen:end}}
+
+{{regen:start;element:heading;level:2}}Section Title{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `level` | `1`–`6` (default `2`) | Determines the tag (`h1`–`h6`) |
+| `style` | `display1`–`display6` | Adds `.heading--display{n}` for fluid display-scale sizing |
+| All others | any string | Set as HTML attribute |
+
+Display scale (fluid, matches `--font-size-display*` tokens):
+
+| `style` | Class | Min (632 px) | Max (1432 px) |
+|---|---|---|---|
+| `display1` | `.heading--display1` | 32 px | 52 px |
+| `display2` | `.heading--display2` | 30 px | 48 px |
+| `display3` | `.heading--display3` | 28 px | 44 px |
+| `display4` | `.heading--display4` | 26 px | 40 px |
+| `display5` | `.heading--display5` | 24 px | 36 px |
+| `display6` | `.heading--display6` | 22 px | 32 px |
+
+#### `element:badge`
+
+Produces an inline `<span class="badge">`. Follows the same `theme`/`style` pattern as `.btn`.
+
+```
+{{regen:start;element:badge;theme:success}}New{{regen:end}}
+
+{{regen:start;element:badge;theme:warning;style:outlined}}Beta{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Adds `.badge--{theme}` |
+| `style` | `solid` (default) · `outlined` | Adds `.badge--outlined` |
+| All others | any string | Set as HTML attribute |
+
+#### `element:alert`
+
+Produces a `<div class="alert">` with a coloured left border and subtle tinted background. Add `role:alert` for live-region announcements.
+
+```
+{{regen:start;element:alert;theme:warning;role:alert}}
+<p>Your session will expire in 5 minutes.</p>
+{{regen:end}}
+
+{{regen:start;element:alert;theme:success}}Changes saved.{{regen:end}}
+```
+
+| Param | Values | Effect |
+|---|---|---|
+| `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Sets border and background colour |
+| `role` | `alert` · `status` | Set as HTML attribute for ARIA live region |
+| All others | any string | Set as HTML attribute |
+
+#### `element:divider`
+
+Produces an `<hr>`. No content between the markers is required.
+
+```
+{{regen:start;element:divider}}{{regen:end}}
+```
+
+### Adding a new element type
+
+1. Add a new `else if (element === '<type>')` branch in `applyRegenDirective` in `scripts/config/global-decorators.js`.
+2. If the element uses special params that must not become HTML attributes, add those key names to `REGEN_CSS_KEYS`.
+3. Add supporting CSS to `styles/config/typography.css` (text/layout elements), `styles/config/buttons.css` (inline components), or `styles/config/globals.css` (block components).
+4. Document the new element in this section.
+
+---
+
 ## styles/styles.css
 
 Loaded in the `<head>` — part of the critical path. Keep it minimal. Only styles required before LCP belong here.
 
+`styles.css` contains three things only:
+
+1. A `@layer` order declaration.
+2. `@import` statements loading the six config partials from `styles/config/`.
+3. The `:root` block with all design tokens.
+
+### Mobile-First Architecture
+
+This is a **mobile-first** project. All base styles target the smallest viewport (`< 632px`). Larger-screen styles are layered on top using `min-width` (`width >=`) media queries at the project's five breakpoints. Never use `max-width` queries.
+
+### Breakpoints
+
+| Token | Literal value | Alias |
+|---|---|---|
+| `--breakpoint-sm` | `632px` | sm |
+| `--breakpoint-md` | `760px` | md |
+| `--breakpoint-lg` | `992px` | lg |
+| `--breakpoint-xl` | `1272px` | xl |
+| `--breakpoint-xxl` | `1432px` | xxl |
+
+CSS custom properties cannot appear inside `@media` conditions. Always write the literal `px` value. The `--breakpoint-*` tokens exist for JavaScript use only.
+
+### Config Partials
+
+| File | Layer | Contents |
+|---|---|---|
+| `styles/config/normalize.css` | `reset` | Modern CSS reset, `box-sizing`, `interpolate-size` |
+| `styles/config/colors.css` | `base` | Raw color palette — `--color-{hue}-{0…900}` for all eight hues |
+| `styles/config/themes.css` | `base` | Semantic tokens for light and dark mode (`--color-primary`, `--color-danger`, …) |
+| `styles/config/typography.css` | `base` | Links, headings, body text, code, blockquote, tables |
+| `styles/config/grid.css` | `layout` | `.container`, `.row`/`.col` flex grid, `.grid` CSS Grid, responsive column classes |
+| `styles/config/forms.css` | `base` | Input, textarea, select, checkbox, radio, validation states |
+| `styles/config/globals.css` | `base` | `body`, header/footer chrome, images, icons, `.button`, sections |
+| `styles/config/utilities.css` | `utilities` | Display, flexbox, gap, spacing, text, position, z-index, border, animation |
+| `styles/config/buttons.css` | `utilities` | `.btn` component system + semantic border-colour, per-side radius, and focus-ring utilities |
+| `styles/config/overrides.css` | `overrides` | **Project-level token overrides** — the correct place to customise any `:root` design token for the project |
+
 ### CSS Custom Properties
 
-All design tokens are defined as custom properties on `:root`. The values change at the 900px desktop breakpoint.
+All design tokens are defined on `:root` in `styles.css`. Tokens never change at a breakpoint — responsive sizing is achieved with fluid `clamp()` values.
 
-#### Colors
+#### Color Architecture
 
-| Property | Value |
-|----------|-------|
-| `--background-color` | `white` |
-| `--light-color` | `#f8f8f8` |
-| `--dark-color` | `#505050` |
-| `--text-color` | `#131313` |
-| `--link-color` | `#3b63fb` |
-| `--link-hover-color` | `#1d3ecf` |
+The color system is split across four files:
+
+1. **`styles/config/colors.css`** — raw palette: `--color-{hue}-{shade}` for 10 shades (0, 100–900) across eight hues. Never use these directly in components.
+2. **`styles/config/themes.css`** — semantic tokens: maps palette shades to purpose-based names for light mode (`:root`) and dark mode (`@media (prefers-color-scheme: dark)` + `[data-eds-theme]` attribute). Use these in all new code.
+3. **`styles/styles.css` `:root`** — legacy bridge tokens (e.g. `--link-color`, `--background-color`) now delegate to the semantic tokens for backwards compatibility.
+4. **`styles/config/overrides.css`** — the single place for project-level token overrides. Because it is imported into the `overrides` cascade layer (the last layer declared in `styles.css`), any property defined here wins over all other layers without needing `!important`. New developers should start here when customising the project's design tokens.
+
+#### Palette — `--color-{hue}-{shade}`
+
+Eight hues, each with eleven shades. All values use `oklch()` for perceptual uniformity. Contrast ratios noted are against white (`--color-neutral-0`).
+
+| Hue | Palette name | Semantic role | Hue angle |
+|---|---|---|---|
+| Neutral | `--color-neutral-*` | page backgrounds, text, borders | `252` (cool gray) |
+| Blue | `--color-blue-*` | primary | `252` |
+| Violet | `--color-violet-*` | secondary | `288` |
+| Teal | `--color-teal-*` | tertiary | `194` |
+| Red | `--color-red-*` | danger | `24` |
+| Green | `--color-green-*` | success | `142` |
+| Sky | `--color-sky-*` | info | `221` |
+| Amber | `--color-amber-*` | warning | `83` |
+
+Shade thresholds (against white):
+
+| Shade | Approx. contrast on white | WCAG threshold met |
+|---|---|---|
+| `0` | 1.0:1 | — |
+| `100` | ~1.1:1 | — |
+| `200` | ~1.4:1 | — |
+| `300` | ~2.2:1 | — |
+| `400` | ~3.1:1 | ✓ AA non-text (UI components, 1.4.11) |
+| `500` | ~4.6:1 | ✓ AA normal text (1.4.3) |
+| `600` | ~6.9:1 | ✓ AA normal text |
+| `700` | ~10.9:1 | ✓ AA + AAA normal text |
+| `800` | ~18:1 | ✓ AAA |
+| `900` | ≥19:1 | ✓ AAA |
+
+> **Amber exception.** Yellow is inherently high-luminance. `--color-amber-600` reaches only ~3.3:1 against white (non-text AA). Use `--color-amber-700` or darker for text on a white background. Filled warning UI must use `--color-neutral-900` (dark) text on amber backgrounds.
+
+#### Semantic Tokens — Light Mode (default)
+
+Each semantic state exposes seven tokens. Use these in all component and block styles.
+
+| Token pattern | Purpose | WCAG criterion |
+|---|---|---|
+| `--color-{state}` | Filled background (buttons, badges, alerts) | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-hover` | Hover background | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-active` | Pressed/active background | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-text` | Text on filled background | 1.4.3 ≥4.5:1 against `--color-{state}` |
+| `--color-{state}-subtle` | Tinted page-area background (alert, chip) | — |
+| `--color-{state}-border` | Border for outlined / ghost variants | 1.4.11 ≥3:1 on page bg |
+| `--color-{state}-focus` | Focus-ring colour | 2.4.11 / 2.4.13 ≥3:1 on page bg |
+
+Available states: `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning`
+
+Surface tokens:
+
+| Token | Light mode | Dark mode |
+|---|---|---|
+| `--color-page-bg` | `neutral-0` (white) | `neutral-900` |
+| `--color-surface` | `neutral-100` | `neutral-800` |
+| `--color-surface-2` | `neutral-200` | `neutral-700` |
+| `--color-border` | `neutral-300` | `neutral-700` |
+| `--color-text` | `neutral-900` | `neutral-100` |
+| `--color-text-muted` | `neutral-600` | `neutral-400` |
+
+#### Dark Mode
+
+Dark mode activates automatically via `@media (prefers-color-scheme: dark)`. Use the `data-eds-theme` attribute on `<html>` to override the OS preference programmatically:
+
+```js
+// Force dark mode
+document.documentElement.setAttribute('data-eds-theme', 'dark');
+
+// Force light mode (even when OS prefers dark)
+document.documentElement.setAttribute('data-eds-theme', 'light');
+
+// Follow OS preference
+document.documentElement.removeAttribute('data-eds-theme');
+```
+
+| `data-eds-theme` value | Effect |
+|---|---|
+| `"dark"` | Forces dark tokens regardless of OS preference |
+| `"light"` | Forces light tokens even when OS prefers dark |
+| *(absent)* | Follows `prefers-color-scheme` automatically |
+
+In dark mode, semantic tokens shift to lighter palette shades so interactive elements remain legible against the dark page background:
+
+| State | Light `--color-{state}` | Dark `--color-{state}` |
+|---|---|---|
+| primary | `blue-600` | `blue-300` |
+| secondary | `violet-600` | `violet-300` |
+| tertiary | `teal-600` | `teal-300` |
+| danger | `red-600` | `red-300` |
+| success | `green-600` | `green-300` |
+| info | `sky-600` | `sky-300` |
+| warning | `amber-600` | `amber-400` |
+
+#### Legacy Bridge Tokens
+
+These exist in `styles/styles.css` `:root` for backwards compatibility with existing blocks. They delegate to the semantic tokens and automatically adapt to dark mode.
+
+| Legacy token | Resolves to |
+|---|---|
+| `--background-color` | `var(--color-page-bg)` |
+| `--surface-color` | `var(--color-surface)` |
+| `--light-color` | `var(--color-surface)` |
+| `--dark-color` | `var(--color-neutral-700)` |
+| `--text-color` | `var(--color-text)` |
+| `--muted-color` | `var(--color-text-muted)` |
+| `--border-color` | `var(--color-border)` |
+| `--link-color` | `var(--color-primary)` |
+| `--link-hover-color` | `var(--color-primary-hover)` |
+| `--accent-color` | `var(--color-primary)` |
+| `--accent-hover-color` | `var(--color-primary-hover)` |
+
+**Do not add new properties to the legacy bridge.** New code should use `--color-{state}` tokens directly.
+
+#### Adding or Extending Colors
+
+- **New palette shade** — add a `--color-{hue}-{shade}` property to `styles/config/colors.css`.
+- **New semantic state** — add a full set of seven tokens to both the `:root` (light) block and both dark-mode blocks in `styles/config/themes.css`.
+- **Project-wide token override** — put it in `styles/config/overrides.css`, which sits in the `overrides` cascade layer and wins over everything else. Always update both the light `:root` block and the two dark-mode blocks (`@media` + `[data-eds-theme="dark"]`) when overriding semantic color tokens:
+
+```css
+/* styles/config/overrides.css — intentional project-wide brand change */
+:root {
+  --color-primary:        var(--color-violet-600);
+  --color-primary-hover:  var(--color-violet-700);
+  --color-primary-active: var(--color-violet-800);
+  --color-primary-text:   var(--color-neutral-0);
+  --color-primary-subtle: var(--color-violet-100);
+  --color-primary-border: var(--color-violet-400);
+  --color-primary-focus:  var(--color-violet-700);
+}
+```
+
+- **Block-level token override** — scope the override to the block selector, not to `:root`. This keeps the change isolated to that one component:
+
+```css
+/* Good — scoped to one block */
+.my-block {
+  --color-primary: var(--color-teal-600);
+}
+
+/* Bad — putting a block-specific value in :root leaks it everywhere */
+:root {
+  --color-primary: var(--color-teal-600);
+}
+```
 
 #### Typography — Families
 
-| Property | Value |
-|----------|-------|
-| `--body-font-family` | `roboto, roboto-fallback, sans-serif` |
-| `--heading-font-family` | `roboto-condensed, roboto-condensed-fallback, sans-serif` |
+| Property | Value | Weights available |
+|---|---|---|
+| `--body-font-family` | `noto-sans, noto-sans-fallback, sans-serif` | 300, 400, 500, 700 (+ italic) |
+| `--heading-font-family` | `noto-serif, noto-serif-fallback, serif` | 300, 400, 500, 700 (+ italic) |
+| `--mono-font-family` | `google-sans-code, google-sans-code-fallback, ui-monospace, monospace` | 300, 400, 500, 700 (+ italic) |
 
-#### Typography — Body Sizes
+Font files live in `fonts/{noto-sans,noto-serif,google-code}/`. Fallback `@font-face` declarations (with `size-adjust` to minimise CLS) are defined at the bottom of `styles/styles.css` and use `local('Arial')`, `local('Georgia')`, and `local('Courier New')` respectively. The full `@font-face` rules (with `font-display: swap`) live in `styles/fonts.css`, loaded by `loadFonts()` in `scripts/scripts.js`.
 
-| Property | Mobile | Desktop (≥ 900px) |
-|----------|--------|-------------------|
-| `--body-font-size-m` | `22px` | `18px` |
-| `--body-font-size-s` | `19px` | `16px` |
-| `--body-font-size-xs` | `17px` | `14px` |
+#### Typography — Fluid Type Scale
 
-#### Typography — Heading Sizes
+All size tokens use `clamp(min, preferred, max)`. The minimum applies at `632px` (sm) and the maximum at `1432px` (xxl). Values scale linearly between those two points — no breakpoint overrides needed.
 
-| Property | Mobile | Desktop (≥ 900px) |
-|----------|--------|-------------------|
-| `--heading-font-size-xxl` | `55px` | `45px` |
-| `--heading-font-size-xl` | `44px` | `36px` |
-| `--heading-font-size-l` | `34px` | `28px` |
-| `--heading-font-size-m` | `27px` | `22px` |
-| `--heading-font-size-s` | `24px` | `20px` |
-| `--heading-font-size-xs` | `22px` | `18px` |
+| Token | Min (632px) | Max (1432px) |
+|---|---|---|
+| `--font-size-display1` | `2rem / 32px` | `3.25rem / 52px` |
+| `--font-size-display2` | `1.875rem / 30px` | `3rem / 48px` |
+| `--font-size-display3` | `1.75rem / 28px` | `2.75rem / 44px` |
+| `--font-size-display4` | `1.625rem / 26px` | `2.5rem / 40px` |
+| `--font-size-display5` | `1.5rem / 24px` | `2.25rem / 36px` |
+| `--font-size-display6` | `1.375rem / 22px` | `2rem / 32px` |
+| `--font-size-h1` | `1.75rem / 28px` | `3rem / 48px` |
+| `--font-size-h2` | `1.625rem / 26px` | `2.5rem / 40px` |
+| `--font-size-h3` | `1.5rem / 24px` | `2.25rem / 36px` |
+| `--font-size-h4` | `1.375rem / 22px` | `2rem / 32px` |
+| `--font-size-h5` | `1.25rem / 20px` | `1.75rem / 28px` |
+| `--font-size-h6` | `1.125rem / 18px` | `1.5rem / 24px` |
+| `--font-size-intro` | `1.25rem / 20px` | `1.75rem / 28px` |
+| `--font-size-p` | `1rem / 16px` | `1.25rem / 20px` |
+| `--font-size-small` | `0.875rem / 14px` | `1rem / 16px` |
+
+#### Spacing
+
+| Token | Value |
+|---|---|
+| `--spacing-1` | `0.25rem` (4px) |
+| `--spacing-2` | `0.5rem` (8px) |
+| `--spacing-3` | `1rem` (16px) |
+| `--spacing-4` | `1.5rem` (24px) |
+| `--spacing-5` | `3rem` (48px) |
+
+#### Border Radius
+
+| Token | Value |
+|---|---|
+| `--border-radius-s` | `0.25rem` |
+| `--border-radius-m` | `0.5rem` |
+| `--border-radius-l` | `1rem` |
+| `--border-radius-pill` | `50rem` |
+| `--border-radius-circle` | `50%` |
+
+#### Shadows
+
+| Token | Value |
+|---|---|
+| `--shadow-s` | subtle 1px/2px shadow |
+| `--shadow-m` | medium 4px/6px shadow |
+| `--shadow-l` | large 10px/15px shadow |
+
+#### Z-index Scale
+
+| Token | Value | Intended use |
+|---|---|---|
+| `--z-below` | `-1` | Behind background |
+| `--z-base` | `0` | Normal flow |
+| `--z-raised` | `10` | Cards, lifted elements |
+| `--z-dropdown` | `100` | Dropdowns, popovers |
+| `--z-sticky` | `200` | Sticky headers |
+| `--z-fixed` | `300` | Fixed navigation |
+| `--z-overlay` | `400` | Overlay backdrops |
+| `--z-modal` | `500` | Modal dialogs |
+| `--z-popover` | `600` | Tooltips, popovers |
+| `--z-toast` | `700` | Toast notifications |
+
+#### Transitions
+
+| Token | Value |
+|---|---|
+| `--transition-speed` | `200ms` |
+| `--transition-ease` | `ease` |
+| `--transition-base` | `200ms ease` |
 
 #### Layout
 
-| Property | Value |
-|----------|-------|
+| Token | Value |
+|---|---|
 | `--nav-height` | `64px` |
+| `--max-width` | `120rem` (1920px) |
+| `--grid-columns` | `12` |
+| `--grid-gutter-width` | `3rem` (48px) |
 
 ### Adding New Custom Properties
 
-Add new tokens to the `:root` block at the top of `styles.css`. If the value changes at the desktop breakpoint, add it to the `@media (width >= 900px)` `:root` override block directly below.
+Add new tokens to the `:root` block in `styles.css`. Follow the naming convention `--{category}-{qualifier}` (e.g. `--spacing-xl`, `--border-radius-m`).
 
-Use the established naming convention: `--{category}-{qualifier}` (e.g. `--spacing-xl`, `--border-radius-m`).
+**Do not add breakpoint-specific overrides.** The design token system uses fluid `clamp()` values for type sizes and static values for everything else. If a value must differ across viewports, use a fluid expression directly in the token value rather than repeating the token at each breakpoint.
 
 ### Section System
 
@@ -193,7 +611,7 @@ The framework wraps each section of authored content in nested divs:
 </main>
 ```
 
-The content wrapper (`main > .section > div`) has a maximum width of `1200px`, is horizontally centered, and has horizontal padding (24px mobile, 32px desktop). Do not override these rules inside blocks — blocks that need full-bleed layouts should use negative margins or the section wrapper instead.
+The content wrapper (`main > .section > div`) has a maximum width of `1200px`, is horizontally centered, and has horizontal padding (`24px` mobile, `32px` at `992px` and up). Do not override these rules inside blocks — blocks that need full-bleed layouts should use negative margins or the section wrapper instead.
 
 ### Section Metadata Styles
 
@@ -261,7 +679,7 @@ Loaded by `loadFonts()` — at most once per session after the session flag is s
 }
 ```
 
-4. Register the font family in `styles/styles.css`:
+4. Override the relevant token in `styles/config/overrides.css` (the `overrides` layer wins without `!important`):
 
 ```css
 :root {

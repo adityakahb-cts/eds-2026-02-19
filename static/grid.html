@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Grid — EDS Design System</title>
+  <link rel="stylesheet" href="../styles/fonts.css">
+  <link rel="stylesheet" href="../styles/styles.css">
+  <style>
+    .demo-nav {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: var(--spacing-3) var(--spacing-4);
+      position: sticky;
+      top: 0;
+      z-index: var(--z-index-sticky);
+    }
+    .demo-nav .container { display: flex; align-items: center; gap: var(--spacing-4); flex-wrap: wrap; }
+    .demo-nav strong { font-size: 1rem; margin-right: auto; }
+    .demo-nav a { font-size: 0.875rem; color: var(--color-link); text-decoration: none; }
+    .demo-nav a:hover { text-decoration: underline; }
+
+    .page-title { margin-top: var(--spacing-7); margin-bottom: var(--spacing-2); }
+    .page-sub { color: var(--color-text-secondary); margin-bottom: var(--spacing-7); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-text-secondary);
+      margin: var(--spacing-8) 0 var(--spacing-3);
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: var(--spacing-2);
+    }
+
+    /* Grid demo column visualizer */
+    .demo-col {
+      background: var(--color-primary-subtle);
+      border: 1px solid var(--color-primary-border);
+      border-radius: var(--border-radius-s);
+      padding: var(--spacing-3) var(--spacing-2);
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-primary);
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-col.alt {
+      background: var(--color-secondary-subtle);
+      border-color: var(--color-secondary-border);
+      color: var(--color-secondary);
+    }
+    .demo-col.dark {
+      background: var(--color-primary);
+      border-color: var(--color-primary-hover);
+      color: var(--color-primary-text);
+    }
+
+    .demo-row { margin-bottom: var(--spacing-3); }
+    .demo-row .row { outline: 1px dashed var(--color-border); }
+
+    .container-demo {
+      background: var(--color-info-subtle);
+      border: 1px dashed var(--color-info-border);
+      border-radius: var(--border-radius-s);
+      padding: var(--spacing-2) var(--spacing-3);
+      margin-bottom: var(--spacing-3);
+      font-size: 0.8rem;
+      color: var(--color-info);
+      font-weight: 600;
+    }
+
+    /* CSS Grid demo */
+    .css-grid-demo {
+      border: 1px dashed var(--color-border);
+      border-radius: var(--border-radius-s);
+      padding: var(--spacing-3);
+      margin-bottom: var(--spacing-4);
+    }
+    .css-grid-demo .grid {
+      background: var(--color-surface-raised);
+    }
+    .g-col {
+      background: var(--color-tertiary-subtle);
+      border: 1px solid var(--color-tertiary-border);
+      border-radius: var(--border-radius-s);
+      padding: var(--spacing-3);
+      text-align: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--color-tertiary);
+    }
+
+    .offset-demo .demo-col { min-height: 40px; }
+
+    code.inline { font-size: 0.75rem; background: var(--color-surface-raised); border: 1px solid var(--color-border); padding: 1px 5px; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <nav class="demo-nav">
+    <div class="container">
+      <strong><a href="index.html" style="color:inherit;text-decoration:none;">EDS Design System</a></strong>
+      <a href="colors.html">Colors</a>
+      <a href="typography.html">Typography</a>
+      <a href="buttons.html">Buttons</a>
+      <a href="forms.html">Forms</a>
+      <a href="grid.html">Grid</a>
+      <a href="utilities.html">Utilities</a>
+    </div>
+  </nav>
+
+  <main>
+    <div class="container">
+      <h1 class="page-title">Grid System</h1>
+      <p class="page-sub">12-column flex grid and CSS Grid utilities from <code>grid.css</code>. Resize the window to see responsive behaviour.</p>
+
+      <!-- CONTAINER VARIANTS -->
+      <p class="section-label">Container Variants</p>
+      <div class="container-demo">
+        <code>.container</code> — max-width: var(--container-max-width), centered, with responsive side padding
+      </div>
+      <div class="container-demo">
+        <code>.container-fluid</code> — full width at all breakpoints
+      </div>
+      <div class="container-demo">
+        <code>.container-sm / .container-md / .container-lg / .container-xl / .container-xxl</code> — fluid until the named breakpoint, then capped
+      </div>
+
+      <!-- EQUAL COLUMNS -->
+      <p class="section-label">Equal Columns — <code class="inline">.col</code></p>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col"><div class="demo-col">col</div></div>
+          <div class="col"><div class="demo-col">col</div></div>
+          <div class="col"><div class="demo-col">col</div></div>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col"><div class="demo-col">col</div></div>
+          <div class="col"><div class="demo-col">col</div></div>
+          <div class="col"><div class="demo-col">col</div></div>
+          <div class="col"><div class="demo-col">col</div></div>
+          <div class="col"><div class="demo-col">col</div></div>
+          <div class="col"><div class="demo-col">col</div></div>
+        </div>
+      </div>
+
+      <!-- FIXED-WIDTH COLUMNS -->
+      <p class="section-label">Fixed-Width Columns — <code class="inline">.col-{n}</code></p>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col-1"><div class="demo-col">1</div></div>
+          <div class="col-11"><div class="demo-col alt">11</div></div>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col-2"><div class="demo-col">2</div></div>
+          <div class="col-10"><div class="demo-col alt">10</div></div>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col-3"><div class="demo-col">3</div></div>
+          <div class="col-9"><div class="demo-col alt">9</div></div>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col-4"><div class="demo-col">4</div></div>
+          <div class="col-8"><div class="demo-col alt">8</div></div>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col-6"><div class="demo-col">6</div></div>
+          <div class="col-6"><div class="demo-col alt">6</div></div>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col-4"><div class="demo-col">4</div></div>
+          <div class="col-4"><div class="demo-col alt">4</div></div>
+          <div class="col-4"><div class="demo-col">4</div></div>
+        </div>
+      </div>
+      <div class="demo-row">
+        <div class="row g-2">
+          <div class="col-3"><div class="demo-col">3</div></div>
+          <div class="col-3"><div class="demo-col alt">3</div></div>
+          <div class="col-3"><div class="demo-col">3</div></div>
+          <div class="col-3"><div class="demo-col alt">3</div></div>
+        </div>
+      </div>
+
+      <!-- RESPONSIVE COLUMNS -->
+      <p class="section-label">Responsive Columns — stack on mobile, expand on desktop</p>
+      <p style="font-size:0.875rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-3);">Below is <code class="inline">.col-12 .col-md-6 .col-lg-4</code> — full width on mobile, 2-col at 760px, 3-col at 992px.</p>
+      <div class="demo-row">
+        <div class="row g-3">
+          <div class="col-12 col-md-6 col-lg-4"><div class="demo-col">col-12 / md-6 / lg-4</div></div>
+          <div class="col-12 col-md-6 col-lg-4"><div class="demo-col alt">col-12 / md-6 / lg-4</div></div>
+          <div class="col-12 col-md-6 col-lg-4"><div class="demo-col">col-12 / md-6 / lg-4</div></div>
+          <div class="col-12 col-md-6 col-lg-4"><div class="demo-col alt">col-12 / md-6 / lg-4</div></div>
+          <div class="col-12 col-md-6 col-lg-4"><div class="demo-col">col-12 / md-6 / lg-4</div></div>
+          <div class="col-12 col-md-6 col-lg-4"><div class="demo-col alt">col-12 / md-6 / lg-4</div></div>
+        </div>
+      </div>
+
+      <!-- OFFSETS -->
+      <p class="section-label">Column Offsets — <code class="inline">.offset-{n}</code></p>
+      <div class="offset-demo">
+        <div class="demo-row">
+          <div class="row g-2">
+            <div class="col-4"><div class="demo-col">col-4</div></div>
+            <div class="col-4 offset-4"><div class="demo-col alt">col-4 offset-4</div></div>
+          </div>
+        </div>
+        <div class="demo-row">
+          <div class="row g-2">
+            <div class="col-3 offset-3"><div class="demo-col">col-3 offset-3</div></div>
+            <div class="col-3 offset-3"><div class="demo-col alt">col-3 offset-3</div></div>
+          </div>
+        </div>
+        <div class="demo-row">
+          <div class="row g-2">
+            <div class="col-6 offset-3"><div class="demo-col dark">col-6 offset-3 (centered)</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAP UTILITIES -->
+      <p class="section-label">Gap Utilities — <code class="inline">.g-{0..5}</code></p>
+      <div style="margin-bottom:var(--spacing-3);">
+        <p style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-2);"><code class="inline">.g-0</code> (no gap)</p>
+        <div class="row g-0"><div class="col-4"><div class="demo-col">A</div></div><div class="col-4"><div class="demo-col alt">B</div></div><div class="col-4"><div class="demo-col">C</div></div></div>
+      </div>
+      <div style="margin-bottom:var(--spacing-3);">
+        <p style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-2);"><code class="inline">.g-2</code></p>
+        <div class="row g-2"><div class="col-4"><div class="demo-col">A</div></div><div class="col-4"><div class="demo-col alt">B</div></div><div class="col-4"><div class="demo-col">C</div></div></div>
+      </div>
+      <div style="margin-bottom:var(--spacing-3);">
+        <p style="font-size:0.8rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-2);"><code class="inline">.g-4</code></p>
+        <div class="row g-4"><div class="col-4"><div class="demo-col">A</div></div><div class="col-4"><div class="demo-col alt">B</div></div><div class="col-4"><div class="demo-col">C</div></div></div>
+      </div>
+
+      <!-- ROW-COLS -->
+      <p class="section-label">Row-Cols Shortcuts — <code class="inline">.row-cols-{n}</code></p>
+      <p style="font-size:0.875rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-3);"><code class="inline">.row-cols-2</code> — forces 2 equal columns regardless of child markup</p>
+      <div class="demo-row">
+        <div class="row row-cols-2 g-2">
+          <div class="col"><div class="demo-col">Item 1</div></div>
+          <div class="col"><div class="demo-col alt">Item 2</div></div>
+          <div class="col"><div class="demo-col">Item 3</div></div>
+          <div class="col"><div class="demo-col alt">Item 4</div></div>
+        </div>
+      </div>
+      <p style="font-size:0.875rem;color:var(--color-text-secondary);margin:var(--spacing-4) 0 var(--spacing-3);"><code class="inline">.row-cols-4</code></p>
+      <div class="demo-row">
+        <div class="row row-cols-4 g-2">
+          <div class="col"><div class="demo-col">A</div></div>
+          <div class="col"><div class="demo-col alt">B</div></div>
+          <div class="col"><div class="demo-col">C</div></div>
+          <div class="col"><div class="demo-col alt">D</div></div>
+          <div class="col"><div class="demo-col">E</div></div>
+          <div class="col"><div class="demo-col alt">F</div></div>
+          <div class="col"><div class="demo-col">G</div></div>
+          <div class="col"><div class="demo-col alt">H</div></div>
+        </div>
+      </div>
+
+      <!-- CSS GRID -->
+      <p class="section-label">CSS Grid — <code class="inline">.grid</code> / <code class="inline">.g-col-{n}</code></p>
+      <p style="font-size:0.875rem;color:var(--color-text-secondary);margin-bottom:var(--spacing-3);">Alternative CSS Grid system for subgrid and container-query use cases.</p>
+
+      <div class="css-grid-demo">
+        <p style="font-size:0.8rem;font-weight:600;margin-bottom:var(--spacing-2);">Basic: .g-col-6 (two halves)</p>
+        <div class="grid">
+          <div class="g-col-6"><div class="g-col">g-col-6</div></div>
+          <div class="g-col-6"><div class="g-col">g-col-6</div></div>
+        </div>
+      </div>
+
+      <div class="css-grid-demo">
+        <p style="font-size:0.8rem;font-weight:600;margin-bottom:var(--spacing-2);">Mixed widths: sidebar + content</p>
+        <div class="grid">
+          <div class="g-col-3"><div class="g-col">g-col-3 (sidebar)</div></div>
+          <div class="g-col-9"><div class="g-col">g-col-9 (main content)</div></div>
+        </div>
+      </div>
+
+      <div class="css-grid-demo">
+        <p style="font-size:0.8rem;font-weight:600;margin-bottom:var(--spacing-2);">With explicit start: .g-start-{n}</p>
+        <div class="grid">
+          <div class="g-col-4 g-start-5"><div class="g-col">g-col-4 g-start-5 (centered)</div></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: var(--spacing-8);"></div>
+    </div>
+  </main>
+</body>
+</html>

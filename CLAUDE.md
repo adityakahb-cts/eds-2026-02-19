@@ -31,6 +31,8 @@ For draft/test content with no CMS page, create files in `tests/` and start the 
 
 ### Project Rules
 
+**For any EDS-related question, error, or implementation decision, you MUST search https://www.aem.live first before answering or writing code.** Use `site:www.aem.live` to restrict web searches to the official documentation. This is mandatory — do not rely on general knowledge alone for EDS topics.
+
 Always check the `docs/` folder for coding standards and rules before writing or modifying any code:
 - `docs/blocks.md` — standards for all block development (directory structure, markup.js pattern, decoration, CSS, accessibility, comments and JSDoc, testing)
 - `docs/globals.md` — guide for modifying global scripts and styles
