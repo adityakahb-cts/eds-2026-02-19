@@ -1,8 +1,9 @@
 /* All header styles are split into breakpoint partials in ./styles/. */
-/* Add new rules to the appropriate partial, not directly in this file.  */
-@import './styles/default.css';
-@import './styles/sm.css';
-@import './styles/md.css';
-@import './styles/lg.css';
-@import './styles/xl.css';
-@import './styles/xxl.css';
+
+/* Add new rules to the appropriate partial, not directly in this file. */
+@import url('./styles/default.css');
+@import url('./styles/sm.css');
+@import url('./styles/md.css');
+@import url('./styles/lg.css');
+@import url('./styles/xl.css');
+@import url('./styles/xxl.css');
