@@ -664,3 +664,57 @@ a.btn--outlined[aria-disabled="true"] {
 .ring-2 { outline-width: 2px; }
 .ring-3 { outline-width: 3px; }
 .ring-4 { outline-width: 4px; }
+
+.btn .lni {
+  line-height: 0;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── Badge component ─────────────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+/*
+ * Usage:
+ *   <span class="badge badge--success">New</span>
+ *   <span class="badge badge--warning badge--outlined">Beta</span>
+ *
+ *   Via regen directive:
+ *   {{regen:start;element:badge;theme:primary}}Label{{regen:end}}
+ */
+
+.badge {
+  --_badge-bg:           var(--color-primary);
+  --_badge-text:         var(--color-primary-text);
+  --_badge-border:       var(--color-primary-border);
+  --_badge-outlined-text: var(--color-primary);
+
+  display: inline-flex;
+  align-items: center;
+  padding-block: 0.2em;
+  padding-inline: 0.6em;
+  border: 1px solid transparent;
+  border-radius: var(--border-radius-pill);
+  background-color: var(--_badge-bg);
+  color: var(--_badge-text);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  line-height: 1.4;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* ── Badge colour variants ── */
+.badge--primary   { --_badge-bg: var(--color-primary);   --_badge-text: var(--color-primary-text);   --_badge-border: var(--color-primary-border);   --_badge-outlined-text: var(--color-primary); }
+.badge--secondary { --_badge-bg: var(--color-secondary); --_badge-text: var(--color-secondary-text); --_badge-border: var(--color-secondary-border); --_badge-outlined-text: var(--color-secondary); }
+.badge--tertiary  { --_badge-bg: var(--color-tertiary);  --_badge-text: var(--color-tertiary-text);  --_badge-border: var(--color-tertiary-border);  --_badge-outlined-text: var(--color-tertiary); }
+.badge--danger    { --_badge-bg: var(--color-danger);    --_badge-text: var(--color-danger-text);    --_badge-border: var(--color-danger-border);    --_badge-outlined-text: var(--color-danger); }
+.badge--success   { --_badge-bg: var(--color-success);   --_badge-text: var(--color-success-text);   --_badge-border: var(--color-success-border);   --_badge-outlined-text: var(--color-success); }
+.badge--info      { --_badge-bg: var(--color-info);      --_badge-text: var(--color-info-text);      --_badge-border: var(--color-info-border);      --_badge-outlined-text: var(--color-info); }
+.badge--warning   { --_badge-bg: var(--color-warning);   --_badge-text: var(--color-warning-text);   --_badge-border: var(--color-warning-border);   --_badge-outlined-text: var(--color-warning-hover); }
+
+/* ── Badge outlined variant ── */
+.badge--outlined {
+  background-color: transparent;
+  border-color: var(--_badge-border);
+  color: var(--_badge-outlined-text);
+}
