@@ -99,9 +99,13 @@
  * Private tokens (--_btn-*) are set once here and overridden by colour-variant
  * and size-modifier classes. The base hover/focus/active rules read those tokens,
  * so they never need to be repeated per variant.
+ *
+ * IMPORTANT: Custom property defaults are on `.btn` alone (specificity 0,1,0).
+ * This lets modifier classes like `.btn--secondary` (also 0,1,0) win by source
+ * order. If `a.btn:any-link` were included here it would raise specificity to
+ * 0,2,0 for anchor elements, overriding all modifier classes.
  */
-.btn,
-a.btn:any-link {
+.btn {
   /* ── Private colour tokens — overridden by .btn--{variant} ── */
   --_btn-bg:            var(--color-primary);
   --_btn-bg-hover:      var(--color-primary-hover);
@@ -124,7 +128,10 @@ a.btn:any-link {
   --_btn-px:        var(--btn-px-md);
   --_btn-icon-size: var(--btn-icon-md);
   --_btn-gap:       var(--btn-gap-md);
+}
 
+.btn,
+a.btn:any-link {
   /* ── Layout ── */
   display: inline-flex;
   align-items: center;
@@ -717,4 +724,9 @@ a.btn--outlined[aria-disabled="true"] {
   background-color: transparent;
   border-color: var(--_badge-border);
   color: var(--_badge-outlined-text);
+}
+
+/* ── Badge pilled shape (regen radius:pilled) ── */
+.badge--pilled {
+  border-radius: var(--border-radius-pill);
 }
