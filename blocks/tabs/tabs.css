@@ -66,26 +66,33 @@
 }
 
 @keyframes tabs-fade-in {
-  from { opacity: 0; transform: translateY(4px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* ── Outlined variant ── */
-.tabs.tabs--outlined .tabs-nav {
+.tabs.outlined .tabs-nav {
   border-bottom: none;
   gap: var(--spacing-2);
 }
 
-.tabs.tabs--outlined .tabs-tab {
+.tabs.outlined .tabs-tab {
   border: 2px solid var(--color-border);
   border-radius: var(--border-radius-m);
 }
 
-.tabs.tabs--outlined .tabs-tab[aria-selected="true"] {
+.tabs.outlined .tabs-tab[aria-selected="true"] {
   border-color: var(--color-primary);
   background-color: var(--color-primary-subtle);
 }
 
-.tabs.tabs--outlined .tabs-tab[aria-selected="true"]::after {
+.tabs.outlined .tabs-tab[aria-selected="true"]::after {
   display: none;
 }
