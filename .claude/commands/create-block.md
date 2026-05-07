@@ -1,0 +1,1 @@
+create a new block called $1 under blocks folder, with all necessary files explained in the @docs/blocks.md file. Keep it at skeleton level, till more instructions are provided for the respective block.md file.

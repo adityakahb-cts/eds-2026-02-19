@@ -1,0 +1,91 @@
+/* ─── Tabs block ─────────────────────────────────────────────────────────── */
+
+.tabs {
+  container-type: inline-size;
+}
+
+/* ── Tab nav ── */
+.tabs .tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-1);
+  border-bottom: 2px solid var(--color-border);
+  margin-block-end: var(--spacing-3);
+}
+
+/* ── Tab button ── */
+.tabs .tabs-tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-block: var(--spacing-2);
+  padding-inline: var(--spacing-3);
+  border: none;
+  border-radius: var(--border-radius-m) var(--border-radius-m) 0 0;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--body-font-family);
+  font-size: var(--font-size-p);
+  font-weight: 500;
+  cursor: pointer;
+  transition: color var(--transition-base), background-color var(--transition-base);
+}
+
+.tabs .tabs-tab:hover {
+  color: var(--color-text);
+  background-color: var(--color-surface-2);
+}
+
+.tabs .tabs-tab[aria-selected="true"] {
+  color: var(--color-primary);
+}
+
+/* Active indicator — inline-start border replaces bottom border of the tablist */
+.tabs .tabs-tab[aria-selected="true"]::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -2px;
+  height: 2px;
+  background-color: var(--color-primary);
+  border-radius: 2px 2px 0 0;
+}
+
+.tabs .tabs-tab:focus-visible {
+  outline: 3px solid var(--color-primary-focus);
+  outline-offset: 2px;
+}
+
+/* ── Panels ── */
+.tabs .tabs-panel {
+  animation: tabs-fade-in 150ms ease;
+}
+
+.tabs .tabs-panel[hidden] {
+  display: none;
+}
+
+@keyframes tabs-fade-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Outlined variant ── */
+.tabs.tabs--outlined .tabs-nav {
+  border-bottom: none;
+  gap: var(--spacing-2);
+}
+
+.tabs.tabs--outlined .tabs-tab {
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-m);
+}
+
+.tabs.tabs--outlined .tabs-tab[aria-selected="true"] {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
+}
+
+.tabs.tabs--outlined .tabs-tab[aria-selected="true"]::after {
+  display: none;
+}
