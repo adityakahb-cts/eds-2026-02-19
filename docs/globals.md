@@ -134,7 +134,7 @@ Regen directives let authors embed declarative markup instructions directly in p
 {{regen:end}}
 ```
 
-**CSS keys** (`element`, `theme`, `style`, `size`, `level`, `author`, `source`) drive class/tag logic and are never set as HTML attributes. All other keys are applied as HTML attributes verbatim (`href`, `alt`, `width`, `target`, `aria-label`, etc.).
+**CSS keys** (`element`, `theme`, `style`, `size`, `radius`, `level`, `author`, `source`) drive class/tag logic and are never set as HTML attributes. All other keys are applied as HTML attributes verbatim (`href`, `alt`, `width`, `target`, `aria-label`, etc.).
 
 ### Supported elements
 
@@ -153,14 +153,15 @@ Link Text
 | `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Adds `.btn--{theme}` |
 | `style` | `solid` (default, no class) · `outlined` | Adds `.btn--outlined` |
 | `size` | `small`/`sm` · `medium`/`md` (default) · `large`/`lg` · `extra-large`/`xl` | Adds `.btn--{size}` |
+| `radius` | `normal` (default) · `pilled` | Adds `.btn--pilled` (capsule shape) |
 | All others | any string | Set as HTML attribute |
 
 #### `element:button`
 
-Always produces a `<button type="button">`. Same `theme`/`style`/`size` class system as `anchor`.
+Always produces a `<button type="button">`. Same `theme`/`style`/`size`/`radius` class system as `anchor`.
 
 ```
-{{regen:start;element:button;theme:danger;style:outlined;aria-label:"Remove item"}}
+{{regen:start;element:button;theme:danger;style:outlined;radius:pilled;aria-label:"Remove item"}}
 Delete
 {{regen:end}}
 ```
@@ -180,6 +181,7 @@ Produces an `<img>`. Place an `<a>` between the markers — its `href` becomes t
 | `alt`, `width`, `height`, `loading`, … | Set as `<img>` attributes |
 | Anchor `href` | Becomes `img.src` (and `a.href` when target is present) |
 | Anchor `target` | Wraps the image in `<a href target>` |
+| `radius` | `normal` (default) · `pilled` → adds `.img--pilled` (pill border-radius) |
 
 #### `element:paragraph`
 
@@ -263,6 +265,7 @@ Produces an inline `<span class="badge">`. Follows the same `theme`/`style` patt
 |---|---|---|
 | `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Adds `.badge--{theme}` |
 | `style` | `solid` (default) · `outlined` | Adds `.badge--outlined` |
+| `radius` | `normal` (default, `border-radius-m`) · `pilled` | Adds `.badge--pilled` (`border-radius-pill`) |
 | All others | any string | Set as HTML attribute |
 
 #### `element:alert`
@@ -280,6 +283,7 @@ Produces a `<div class="alert">` with a coloured left border and subtle tinted b
 | Param | Values | Effect |
 |---|---|---|
 | `theme` | `primary` · `secondary` · `tertiary` · `danger` · `success` · `info` · `warning` | Sets border and background colour |
+| `radius` | `normal` (default, `border-radius-m`) · `pilled` | Adds `.alert--pilled`; collapses the accent border to uniform 1 px |
 | `role` | `alert` · `status` | Set as HTML attribute for ARIA live region |
 | All others | any string | Set as HTML attribute |
 
