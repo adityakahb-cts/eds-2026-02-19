@@ -87,32 +87,26 @@ main img {
   height: 100%;
 }
 
-/* ── Buttons ── */
+/*
+ * ── Legacy button system (.button class) ──────────────────────────────────
+ * Scoped to :not(.btn) so the modern .btn system in buttons.css is never
+ * affected by these rules. This prevents cascade conflicts that would make
+ * all .btn theme and size variants look identical.
+ */
 a.button:any-link,
-button {
+button:not(.btn) {
   box-sizing: border-box;
   display: inline-block;
   max-width: 100%;
   margin-block: 12px;
   border: 2px solid transparent;
   border-radius: var(--border-radius-pill);
-
-  /*
-   * WCAG 2.5.8 Target Size (Minimum) — interactive targets must be at least
-   * 24 × 24 CSS px. Padding gives buttons a natural 44 px height at the base
-   * font size, well above the 24 px floor.
-   */
   min-height: 44px;
   padding: 0.5em 1.2em;
   font-family: var(--body-font-family);
   font-size: var(--font-size-p);
   font-style: normal;
   font-weight: 500;
-
-  /*
-   * WCAG 1.4.12 Text Spacing — line-height must accommodate user overrides
-   * up to 1.5× without clipping or loss of content.
-   */
   line-height: 1.5;
   text-align: center;
   text-decoration: none;
@@ -127,34 +121,34 @@ button {
 
 a.button:hover,
 a.button:focus,
-button:hover,
-button:focus {
+button:not(.btn):hover,
+button:not(.btn):focus {
   background-color: var(--link-hover-color);
   cursor: pointer;
 }
 
 a.button:focus-visible,
-button:focus-visible {
+button:not(.btn):focus-visible {
   outline: 2px solid var(--accent-color);
   outline-offset: 2px;
 }
 
-button:disabled,
-button:disabled:hover {
+button:not(.btn):disabled,
+button:not(.btn):disabled:hover {
   background-color: var(--surface-color);
   color: var(--muted-color);
   cursor: not-allowed;
 }
 
 a.button.secondary,
-button.secondary {
+button:not(.btn).secondary {
   background-color: transparent;
   border-color: currentcolor;
   color: var(--text-color);
 }
 
 a.button.secondary:hover,
-button.secondary:hover {
+button:not(.btn).secondary:hover {
   background-color: var(--surface-color);
 }
 
@@ -219,6 +213,18 @@ main > .section:first-of-type {
 .alert--success   { --_alert-bg: var(--color-success-subtle);   --_alert-border: var(--color-success-border); }
 .alert--info      { --_alert-bg: var(--color-info-subtle);      --_alert-border: var(--color-info-border); }
 .alert--warning   { --_alert-bg: var(--color-warning-subtle);   --_alert-border: var(--color-warning-border); }
+
+/* ── Alert pilled shape (regen radius:pilled) ── */
+.alert--pilled {
+  border-radius: var(--border-radius-pill);
+  border-inline-start-width: 1px;
+}
+
+/* ── Image pilled shape (regen element:image radius:pilled) ── */
+img.img--pilled {
+  border-radius: var(--border-radius-pill);
+  overflow: hidden;
+}
 
 /* section metadata variants */
 main .section.light,

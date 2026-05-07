@@ -33,7 +33,7 @@ export function decorateIcons(main) {
  * Directive keys that control CSS class generation.
  * All other keys are applied as HTML attributes verbatim.
  */
-const REGEN_CSS_KEYS = new Set(['element', 'theme', 'style', 'size', 'level', 'author', 'source']);
+const REGEN_CSS_KEYS = new Set(['element', 'theme', 'style', 'size', 'radius', 'level', 'author', 'source']);
 
 /** Matches a `{{regen:start;...}}` marker inside a text node. */
 const REGEN_START_RE = /\{\{regen:start;(.*?)\}\}/;
@@ -67,6 +67,7 @@ function parseRegenDirective(raw) {
  */
 const SIZE_MAP = {
   small: 'sm', sm: 'sm',
+  normal: 'md', medium: 'md', md: 'md',
   large: 'lg', lg: 'lg',
   'extra-large': 'xl', xl: 'xl',
 };
@@ -77,17 +78,42 @@ const SIZE_MAP = {
  * @param {Record<string,string>} params Parsed directive parameters
  */
 function applyRegenParams(el, params) {
-  const { theme, style, size } = params;
+  const { theme, style, size, radius } = params;
   const sizeSuffix = size ? (SIZE_MAP[size] ?? size) : null;
 
   el.classList.add('btn');
   if (theme) el.classList.add(`btn--${theme}`);
   if (style && style !== 'solid') el.classList.add(`btn--${style}`);
   if (sizeSuffix && sizeSuffix !== 'md') el.classList.add(`btn--${sizeSuffix}`);
+  if (radius === 'pilled') el.classList.add('btn--pilled');
 
   Object.entries(params).forEach(([key, value]) => {
     if (!REGEN_CSS_KEYS.has(key)) el.setAttribute(key, value);
   });
+}
+
+/**
+ * Serializes an array of sibling nodes to an HTML string, preserving element
+ * outerHTML (so icon `<i>` elements are not lost) and text node content.
+ * @param {Node[]} nodes Sibling nodes between regen markers
+ * @returns {string} Serialized HTML
+ */
+function serializeBetween(nodes) {
+  return nodes
+    .map((n) => (n.nodeType === Node.ELEMENT_NODE ? n.outerHTML : n.textContent))
+    .join('');
+}
+
+/**
+ * Adds `.btn--icon-only` when an anchor or button contains only a lineicon
+ * with no visible text, making the element square so `radius:pilled` renders
+ * as a perfect circle.
+ * @param {Element} el The anchor or button element
+ */
+function applyIconOnlyIfNeeded(el) {
+  if (el.textContent.trim() === '' && el.querySelector('.lni, .btn__icon')) {
+    el.classList.add('btn--icon-only');
+  }
 }
 
 /**
@@ -130,6 +156,29 @@ function applyRegenDirective(startTextNode) {
   const directiveMatch = startTextNode.textContent.match(REGEN_START_RE);
   if (!directiveMatch) return;
 
+  // If both markers are in the same text node (no intervening DOM elements),
+  // split it into sibling text nodes so the standard sibling-walking logic works.
+  const startStr = directiveMatch[0];
+  const startIdx = startTextNode.textContent.indexOf(startStr);
+  const afterStart = startTextNode.textContent.slice(startIdx + startStr.length);
+  if (REGEN_END_RE.test(afterStart)) {
+    const { parentNode } = startTextNode;
+    const endStr = '{{regen:end}}';
+    const endIdx = startTextNode.textContent.indexOf(endStr, startIdx + startStr.length);
+    const before = startTextNode.textContent.slice(0, startIdx);
+    const inner = startTextNode.textContent.slice(startIdx + startStr.length, endIdx);
+    const after = startTextNode.textContent.slice(endIdx + endStr.length);
+    if (before) parentNode.insertBefore(document.createTextNode(before), startTextNode);
+    const newStart = document.createTextNode(startStr);
+    parentNode.insertBefore(newStart, startTextNode);
+    if (inner) parentNode.insertBefore(document.createTextNode(inner), startTextNode);
+    parentNode.insertBefore(document.createTextNode(endStr), startTextNode);
+    if (after) parentNode.insertBefore(document.createTextNode(after), startTextNode);
+    parentNode.removeChild(startTextNode);
+    applyRegenDirective(newStart);
+    return;
+  }
+
   const params = parseRegenDirective(directiveMatch[0]);
   const { element } = params;
 
@@ -157,6 +206,7 @@ function applyRegenDirective(startTextNode) {
     Object.entries(params).forEach(([key, value]) => {
       if (!REGEN_CSS_KEYS.has(key)) img.setAttribute(key, value);
     });
+    if (params.radius === 'pilled') img.classList.add('img--pilled');
 
     if (imgAnchor) {
       const href = imgAnchor.getAttribute('href');
@@ -233,10 +283,11 @@ function applyRegenDirective(startTextNode) {
     startTextNode.parentNode.insertBefore(h, endTextNode);
   } else if (element === 'badge') {
     const badge = document.createElement('span');
-    const { theme: bTheme, style: bStyle } = params;
+    const { theme: bTheme, style: bStyle, radius: bRadius } = params;
     badge.classList.add('badge');
     if (bTheme) badge.classList.add(`badge--${bTheme}`);
     if (bStyle && bStyle !== 'solid') badge.classList.add(`badge--${bStyle}`);
+    if (bRadius === 'pilled') badge.classList.add('badge--pilled');
     Object.entries(params).forEach(([key, value]) => {
       if (!REGEN_CSS_KEYS.has(key)) badge.setAttribute(key, value);
     });
@@ -248,10 +299,11 @@ function applyRegenDirective(startTextNode) {
     startTextNode.parentNode.insertBefore(badge, endTextNode);
   } else if (element === 'alert') {
     const alertEl = document.createElement('div');
-    const { theme: aTheme, style: aStyle } = params;
+    const { theme: aTheme, style: aStyle, radius: aRadius } = params;
     alertEl.classList.add('alert');
     if (aTheme) alertEl.classList.add(`alert--${aTheme}`);
     if (aStyle) alertEl.classList.add(`alert--${aStyle}`);
+    if (aRadius === 'pilled') alertEl.classList.add('alert--pilled');
     Object.entries(params).forEach(([key, value]) => {
       if (!REGEN_CSS_KEYS.has(key)) alertEl.setAttribute(key, value);
     });
@@ -271,30 +323,25 @@ function applyRegenDirective(startTextNode) {
     startTextNode.parentNode.insertBefore(hr, endTextNode);
   } else if (element === 'anchor') {
     const existingAnchor = between.find((n) => n.nodeType === Node.ELEMENT_NODE && n.tagName === 'A');
-    const existingEl = between.find((n) => n.nodeType === Node.ELEMENT_NODE);
     if (existingAnchor) {
-      // Enhance the existing <a> in place
       applyRegenParams(existingAnchor, params);
+      if (!existingAnchor.getAttribute('href')) existingAnchor.setAttribute('href', '#');
+      applyIconOnlyIfNeeded(existingAnchor);
     } else {
-      // No <a> present — create one and insert it
       const a = document.createElement('a');
       applyRegenParams(a, params);
-      a.innerHTML = existingEl ? existingEl.innerHTML : between
-        .filter((n) => n.nodeType === Node.TEXT_NODE)
-        .map((n) => n.textContent)
-        .join('');
+      if (!a.getAttribute('href')) a.setAttribute('href', '#');
+      a.innerHTML = serializeBetween(between);
+      applyIconOnlyIfNeeded(a);
       between.forEach((n) => n.parentNode.removeChild(n));
       startTextNode.parentNode.insertBefore(a, endTextNode);
     }
   } else if (element === 'button') {
-    const existingEl = between.find((n) => n.nodeType === Node.ELEMENT_NODE);
     const btn = document.createElement('button');
     if (!params.type) btn.setAttribute('type', 'button');
     applyRegenParams(btn, params);
-    btn.innerHTML = existingEl ? existingEl.innerHTML : between
-      .filter((n) => n.nodeType === Node.TEXT_NODE)
-      .map((n) => n.textContent)
-      .join('');
+    btn.innerHTML = serializeBetween(between);
+    applyIconOnlyIfNeeded(btn);
     between.forEach((n) => n.parentNode.removeChild(n));
     startTextNode.parentNode.insertBefore(btn, endTextNode);
   }
