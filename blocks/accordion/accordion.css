@@ -1,0 +1,9 @@
+.accordion .accordion-root {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.accordion .accordion-item {
+  padding: var(--spacing-2);
+}
